@@ -1,11 +1,20 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router'
-import { initSentry } from './core/config/Sentry'
-import { SentryProvider } from './core/providers/SentryProvider'
 
-import './index.css'
-import App from './core/router/Router'
+// Providers & Wrappers
+import { BrowserRouter } from 'react-router'
+import SentryProvider from './core/wrappers/SentryProvider'
+import StyleProvider from './core/wrappers/styles/StyleProvider'
+import LoadingWrapper from './core/wrappers/LoadingWrapper'
+import { NotificationProvider } from './core/contexts/NotificationContext'
+
+// Styles
+import './styles/index.css'
+import 'primereact/resources/themes/md-light-indigo/theme.css'
+import 'primereact/resources/primereact.css'
+
+import { initSentry } from './lib/Sentry'
+import Router from './router/Router'
 
 initSentry()
 
@@ -13,7 +22,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SentryProvider>
       <BrowserRouter>
-        <App />
+        <StyleProvider>
+          <LoadingWrapper>
+            <NotificationProvider>
+              <Router />
+            </NotificationProvider>
+          </LoadingWrapper>
+        </StyleProvider>
       </BrowserRouter>
     </SentryProvider>
   </StrictMode>
