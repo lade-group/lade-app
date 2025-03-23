@@ -10,7 +10,7 @@ import { NotificationProvider } from './core/contexts/NotificationContext'
 
 // Styles
 import './styles/index.css'
-import 'primereact/resources/themes/md-light-indigo/theme.css'
+import 'primereact/resources/themes/lara-light-blue/theme.css'
 import 'primereact/resources/primereact.css'
 
 import { initSentry } from './lib/Sentry'
