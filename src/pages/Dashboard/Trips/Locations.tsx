@@ -7,6 +7,9 @@ import MapIcon from '@mui/icons-material/Map'
 import ListIcon from '@mui/icons-material/List'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import CloseIcon from '@mui/icons-material/Close'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 
@@ -95,6 +98,18 @@ const LocationsPage = () => {
     )
   }
 
+  const expandAll = () => {
+    const _expandedRows: any = {}
+    clients.forEach((client) => {
+      if (client.code) _expandedRows[client.code] = true
+    })
+    setExpandedRows(_expandedRows)
+  }
+
+  const collapseAll = () => {
+    setExpandedRows(null)
+  }
+
   const getAverageCoords = (clients: Client[]): Coords => {
     const validCoords = clients.map((c) => c.coords).filter((c): c is Coords => !!c)
 
@@ -105,6 +120,17 @@ const LocationsPage = () => {
 
     return { lat: avgLat, lng: avgLng }
   }
+
+  const tableHeader = (
+    <div className='flex flex-wrap justify-end gap-2'>
+      <Button variant='text' color='primary' startIcon={<ExpandMoreIcon />} onClick={expandAll}>
+        Expandir todo
+      </Button>
+      <Button variant='text' color='primary' startIcon={<ExpandLessIcon />} onClick={collapseAll}>
+        Colapsar todo
+      </Button>
+    </div>
+  )
 
   return (
     <div className='h-full'>
@@ -212,6 +238,7 @@ const LocationsPage = () => {
           ) : (
             <DataTable
               value={clients}
+              header={tableHeader}
               dataKey='code'
               expandedRows={expandedRows}
               onRowToggle={(e) => setExpandedRows(e.data)}
