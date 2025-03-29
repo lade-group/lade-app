@@ -11,9 +11,7 @@ const DashboardLayout = () => {
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <div className='flex-grow bg-light m-10'>
         <Header isCollapsed={isCollapsed} />
-        <div
-          className={`${isCollapsed ? 'pl-[6rem] delay-200' : 'pl-[16rem]'} body flex-grow-1 pt-15 pr-10`}
-        >
+        <div className={`${isCollapsed ? 'pl-[6rem] delay-200' : 'pl-[16rem]'} h-full pt-15 pr-10`}>
           <Outlet />
         </div>
       </div>

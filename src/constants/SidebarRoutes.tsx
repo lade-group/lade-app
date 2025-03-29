@@ -32,14 +32,26 @@ export const routes: RouteType[] = [
     children: [
       {
         type: 'tab',
-        label: 'Lista de Viajes',
-        path: '/dashboard/all-employees',
-        element: <GroupsIcon />,
+        label: 'Viajes',
+        path: ROUTES.VIAJES,
+        element: <SignpostIcon />,
       },
       {
         type: 'tab',
-        label: 'Facturas Viajes',
-        path: '/dashboard/add-employees',
+        label: 'Rutas',
+        path: ROUTES.RUTAS,
+        element: <AddRoadIcon />,
+      },
+      {
+        type: 'tab',
+        label: 'Locaciones',
+        path: ROUTES.LOCACIONES,
+        element: <PlaceIcon />,
+      },
+      {
+        type: 'tab',
+        label: 'Facturas',
+        path: ROUTES.FACTURAS,
         element: <ReceiptIcon />,
       },
     ],
@@ -55,46 +67,14 @@ export const routes: RouteType[] = [
     type: 'tab',
     label: 'Colaboradores',
     element: <BadgeIcon />,
-    path: '/dashboard/colaboradores',
+    path: ROUTES.COLABORADORES,
   },
 
   {
-    type: 'menu',
+    type: 'tab',
     label: 'Unidades',
     element: <LocalShippingIcon />,
-    children: [
-      {
-        type: 'tab',
-        label: 'Unidades',
-        path: '/dashboard/all-employees',
-        element: <ElectricRickshawIcon />,
-      },
-      {
-        type: 'tab',
-        label: 'Tipos de unidades',
-        path: '/dashboard/add-employees',
-        element: <CarCrashIcon />,
-      },
-    ],
-  },
-  {
-    type: 'menu',
-    label: 'Rutas',
-    element: <SignpostIcon />,
-    children: [
-      {
-        type: 'tab',
-        label: 'Rutas',
-        path: '/dashboard/routes',
-        element: <AddRoadIcon />,
-      },
-      {
-        type: 'tab',
-        label: 'Locaciones',
-        path: '/dashboard/locations',
-        element: <PlaceIcon />,
-      },
-    ],
+    path: ROUTES.UNIDADES,
   },
 
   {
@@ -104,14 +84,14 @@ export const routes: RouteType[] = [
   {
     type: 'tab',
     label: 'Usuarios',
-    path: '/dashboard/all-users',
+    path: ROUTES.USUSARIOS,
     element: <GroupsIcon />,
   },
 
   {
     type: 'tab',
     label: 'Ajustes Equipo',
-    path: '/dashboard/settings-teams',
+    path: ROUTES.AJUSTES_DE_EQUIPO,
     element: <ManageAccountsIcon />,
   },
   {
@@ -122,13 +102,13 @@ export const routes: RouteType[] = [
       {
         type: 'tab',
         label: 'Tu suscripcion',
-        path: '/dashboard/my-suscription',
+        path: ROUTES.TU_SUSCRIPCION,
         element: <VerifiedIcon />,
       },
       {
         type: 'tab',
         label: 'Historial de pagos',
-        path: '/dashboard/payment-logs',
+        path: ROUTES.HISTORIAL_DE_PAGOS,
         element: <HistoryIcon />,
       },
     ],
@@ -136,7 +116,7 @@ export const routes: RouteType[] = [
   {
     type: 'tab',
     label: 'Historial',
-    path: '/dashboard/logs',
+    path: ROUTES.HISTORIAL,
     element: <WorkHistoryIcon />,
   },
 ]

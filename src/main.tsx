@@ -7,6 +7,7 @@ import SentryProvider from './core/wrappers/SentryProvider'
 import StyleProvider from './core/wrappers/styles/StyleProvider'
 import LoadingWrapper from './core/wrappers/LoadingWrapper'
 import { NotificationProvider } from './core/contexts/NotificationContext'
+import { APIProvider } from '@vis.gl/react-google-maps'
 
 // Styles
 import './styles/index.css'
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')!).render(
         <StyleProvider>
           <LoadingWrapper>
             <NotificationProvider>
-              <Router />
+              <APIProvider apiKey={'AIzaSyAoA48PKTl6pgEa0P5lILzXNbZu2m2PjZs'}>
+                <Router />
+              </APIProvider>
             </NotificationProvider>
           </LoadingWrapper>
         </StyleProvider>

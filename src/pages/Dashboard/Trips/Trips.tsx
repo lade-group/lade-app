@@ -1,8 +1,8 @@
-const DriversPage = () => {
+const TripsPage = () => {
   return (
     <div>
       <div className='flex justify-between'>
-        <h1 className='text-4xl text-primary font-bold'>Colaboradores</h1>
+        <h1 className='text-4xl text-primary font-bold'>Viajes</h1>
       </div>
       <div>
         <span className='text-lg'>Maneja a los pilotos de tus unidades</span>
@@ -12,4 +12,4 @@ const DriversPage = () => {
   )
 }
 
-export default DriversPage
+export default TripsPage

@@ -1,4 +1,4 @@
-const DriversPage = () => {
+const LocationPage = () => {
   return (
     <div>
       <div className='flex justify-between'>
@@ -12,4 +12,4 @@ const DriversPage = () => {
   )
 }
 
-export default DriversPage
+export default LocationPage

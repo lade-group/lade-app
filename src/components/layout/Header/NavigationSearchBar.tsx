@@ -10,9 +10,13 @@ const NavigationSearchBar = () => {
 
   useEffect(() => {
     const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    const remove_underscore = (str: string) => str.replace(/_/gi, ' ')
 
     const transformObjectToArray = (obj: Record<string, string>) =>
-      Object.entries(obj).map(([key, value]) => ({ label: capitalize(key), path: value }))
+      Object.entries(obj).map(([key, value]) => ({
+        label: remove_underscore(capitalize(key)),
+        path: value,
+      }))
 
     setOptions([...transformObjectToArray(ROUTES)])
   }, [])
