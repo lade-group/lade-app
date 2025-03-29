@@ -9,7 +9,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import CloseIcon from '@mui/icons-material/Close'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-
+import LocationPageTour from '../../../components/ui/HelpTour/LocationPageTour'
 interface Coords {
   lat: number
   lng: number
@@ -107,12 +107,13 @@ const LocationsPage = () => {
   }
 
   return (
-    <div className='h-full'>
+    <div id='location-page' className='h-full'>
       <div className='flex justify-between'>
         <span className='flex items-center'>
           <h1 className='text-4xl text-primary font-bold'>Locaciones</h1>
+          <LocationPageTour />
         </span>
-        <Button variant='contained' color='primary'>
+        <Button id='create-location-button' variant='contained' color='primary'>
           Agregar Locacion
         </Button>
       </div>
