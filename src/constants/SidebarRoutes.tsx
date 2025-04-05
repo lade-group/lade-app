@@ -15,8 +15,6 @@ import ReceiptIcon from '@mui/icons-material/Receipt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
 import VerifiedIcon from '@mui/icons-material/Verified'
-import CarCrashIcon from '@mui/icons-material/CarCrash'
-import ElectricRickshawIcon from '@mui/icons-material/ElectricRickshaw'
 
 export const routes: RouteType[] = [
   {
