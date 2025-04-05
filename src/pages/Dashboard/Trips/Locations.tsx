@@ -36,23 +36,47 @@ const LocationsPage = () => {
     const loadedClients = [
       {
         code: '123',
-        name: 'Almacen 1',
-        address:
-          'Blvd. Luis Donaldo Colosio 1898, Residencial San Alberto, 25204 Saltillo, Coah. casa',
-        coords: { lat: 25.468258295586864, lng: -100.95745111370331 },
+        name: 'John Deere Componentes',
+        address: '25903 Ramos Arizpe, Coah.',
+        coords: { lat: 25.586105661268178, lng: -100.90682193739505 },
       },
       {
         code: '124',
-        name: 'Almacen 2',
-        address: 'Blvd. Eulalio Gutiérrez Treviño 3990, Los González, 25204 Saltillo, Coah.',
-        coords: { lat: 25.468729459187163, lng: -100.94988302878721 },
+        name: 'John Deere Saltillo',
+        address: 'Blvd. Jesús Valdez Sánchez 425, República Oriente, 25280 Saltillo, Coah.',
+        coords: { lat: 25.433939321636274, lng: -100.99092848309063 },
       },
       {
         code: '125',
-        name: 'Almacen 3',
+        name: 'Stellantis Saltillo - Ramos Arizpe',
+        address: 'Zona Industrial, 25905 Ramos Arizpe, Coah.',
+        coords: { lat: 25.52359454338413, lng: -100.95494571704053 },
+      },
+      {
+        code: '126',
+        name: 'ZF Powertrain Ramos Arizpe',
         address:
-          'Blvd. Eulalio Gutiérrez Treviño 2275, Ex hacienda, San José de los Cerritos, 25293 Saltillo, Coah.',
-        coords: { lat: 25.462047368094318, lng: -100.95139228975574 },
+          'Parque Industrial, Industria Metalúrgica 1010-Interior 2, Zona Industrial, 25900 Ramos Arizpe, Coah.',
+        coords: { lat: 25.557360270362352, lng: -100.93184913913642 },
+      },
+      {
+        code: '127',
+        name: 'Daimler Freightliner',
+        address: '25304 Daimler Freightliner, Coah.',
+        coords: { lat: 25.245042728013352, lng: -101.15882743960691 },
+      },
+      {
+        code: '128',
+        name: 'GM',
+        address:
+          'Carr. Monterrey - Saltillo Kilómetro 7.5, Zona Industrial, 25900 Ramos Arizpe, Coah.',
+        coords: { lat: 25.510482254761524, lng: -100.96926167137828 },
+      },
+      {
+        code: '129',
+        name: 'Stellantis Derramadero',
+        address: 'Calle Gral. Cepeda, Zona Industrial, 25300 Ramos Arizpe, Coah.',
+        coords: { lat: 25.260498684104835, lng: -101.10639831929495 },
       },
     ]
 
@@ -77,7 +101,6 @@ const LocationsPage = () => {
             mapId={`map-${data.code}`} // ID único por cliente
             gestureHandling='greedy'
             disableDefaultUI={true}
-            mapTypeId='hybrid'
           >
             <AdvancedMarker position={data.coords!}>
               <div
