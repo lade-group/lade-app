@@ -50,7 +50,7 @@ const AvatarMenuButton = () => {
           <PersonIcon style={{ marginRight: 8 }} className='text-primary' />
           <span className='text-primary'>Perfil</span>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={() => handlePath('/equipos')}>
           <GroupsIcon style={{ marginRight: 8 }} className='text-primary' />
           <span className='text-primary'>Cambiar de Equipo</span>
         </MenuItem>

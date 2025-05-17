@@ -9,10 +9,15 @@ import LoadingWrapper from './core/wrappers/LoadingWrapper'
 import { NotificationProvider } from './core/contexts/NotificationContext'
 import { APIProvider } from '@vis.gl/react-google-maps'
 
+// Context
+
+import AuthProvider from './core/contexts/AuthContext'
+import ClientProvider from './core/contexts/ClientContext'
 // Styles
-import './styles/index.css'
+
 import 'primereact/resources/themes/lara-light-blue/theme.css'
 import 'primereact/resources/primereact.css'
+import './styles/index.css'
 
 import { initSentry } from './lib/Sentry'
 import Router from './router/Router'
@@ -27,7 +32,11 @@ createRoot(document.getElementById('root')!).render(
           <LoadingWrapper>
             <NotificationProvider>
               <APIProvider apiKey={'AIzaSyAoA48PKTl6pgEa0P5lILzXNbZu2m2PjZs'}>
-                <Router />
+                <AuthProvider>
+                  <ClientProvider>
+                    <Router />
+                  </ClientProvider>
+                </AuthProvider>
               </APIProvider>
             </NotificationProvider>
           </LoadingWrapper>

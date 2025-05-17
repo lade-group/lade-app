@@ -2,5 +2,38 @@
 
 @theme {
   --color-primary: oklch(30.18% 0.0579 276.93);
+  --color-primary-hover: oklch(0.4 0.0579 276.93);
   --color-secondary: oklch(93.57% 0.015 277.84);
 }
+
+
+
+.p-steps .p-steps-item.p-highlight .p-steps-number {
+  background: oklch(30.18% 0.0579 276.93);
+  color: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+

@@ -1,108 +1,69 @@
-import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator'
 import { DataTable, DataTableSelectEvent } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Tag } from 'primereact/tag'
-import { useNavigate } from 'react-router'
+import { TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material'
 import { ROUTES } from '../../../../constants/routes'
-
-interface Client {
-  code?: string
-  company?: string
-  name_related?: string
-  email?: string
-  phone?: string
-  status?: string
-  last_service_date?: string
-}
+import { useState } from 'react'
+import { useClientContext } from '../../../../core/contexts/ClientContext'
+import ClientStatusTag from '../../../ui/Tag/StatusTag'
 
 const ClientListTable = () => {
   const navigate = useNavigate()
-  const [clients, setClients] = useState<Client[]>([])
-
-  useEffect(() => {
-    setClients([
-      {
-        code: '123',
-        company: 'GM',
-        name_related: 'GM planta Saltillo',
-        email: 'eduardo.varela@gm.com',
-        phone: '+528441039924',
-        status: 'Activo',
-        last_service_date: '',
-      },
-      {
-        code: '124',
-        company: 'Stelantins',
-        name_related: 'Stelantins planta Derramadero',
-        email: 'eduardo.varela@stelantis.com',
-        phone: '+528441039924',
-        status: 'Desactivado',
-        last_service_date: '',
-      },
-      {
-        code: '125',
-        company: 'ZF',
-        name_related: 'ZF planta Ramos',
-        email: 'eduardo.varela@zf.com',
-        phone: '+528441039924',
-        status: 'Activo',
-        last_service_date: '',
-      },
-      {
-        code: '126',
-        company: 'Daimler',
-        name_related: 'Daimler planta Derramadero',
-        email: 'eduardo.varela@daimler.com',
-        phone: '+528441039924',
-        status: 'Eliminado',
-        last_service_date: '',
-      },
-    ])
-  }, [])
-
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-
-  const rowSelected = (e: DataTableSelectEvent) => {
-    navigate(`${ROUTES.CLIENTES}/${e.data.code}`)
-  }
-
-  const statusBodyTemplate = (client: Client) => {
-    return <Tag value={client.status} severity={getSeverity(client)}></Tag>
-  }
-
-  const getSeverity = (client: Client) => {
-    switch (client.status) {
-      case 'Activo':
-        return 'success'
-
-      case 'Desactivado':
-        return 'warning'
-
-      case 'Eliminado':
-        return 'danger'
-
-      default:
-        return null
-    }
-  }
+  const { clients, totalRecords, search, statusFilter, setSearch, setStatusFilter } =
+    useClientContext()
 
   const [first, setFirst] = useState(0)
   const [rows, setRows] = useState(10)
+  const [selectedClient, setSelectedClient] = useState<any>(null)
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {
     setFirst(event.first)
     setRows(event.rows)
   }
 
+  const rowSelected = (e: DataTableSelectEvent) => {
+    navigate(`${ROUTES.CLIENTES}/${e.data.id || e.data.code}`)
+  }
+
+  const statusBodyTemplate = (client: any) => {
+    return <ClientStatusTag status={client.status} />
+  }
+
   return (
-    <div className='flex flex-col justify-between content-between '>
+    <div className='flex flex-col gap-6'>
+      {/* Filtros */}
+      <div className='flex flex-wrap gap-6 items-end'>
+        <TextField
+          label='Buscar por nombre, email o RFC'
+          variant='outlined'
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          size='small'
+          className='w-80'
+        />
+
+        <FormControl size='small' className='w-60'>
+          <InputLabel id='status-filter-label'>Estatus</InputLabel>
+          <Select
+            labelId='status-filter-label'
+            value={statusFilter}
+            label='Estatus'
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value=''>Todos</MenuItem>
+            <MenuItem value='ACTIVE'>Activo</MenuItem>
+            <MenuItem value='CANCELLED'>Desactivado</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+
+      {/* Tabla */}
       <DataTable
-        lazy
-        removableSort
         value={clients}
+        removableSort
         sortMode='multiple'
-        tableStyle={{ minWidth: '50rem' }}
+        tableStyle={{ minWidth: '70rem' }}
         selection={selectedClient}
         onSelectionChange={(e) => setSelectedClient(e.value)}
         selectionMode='single'
@@ -110,21 +71,25 @@ const ClientListTable = () => {
         scrollable
         scrollHeight='flex'
       >
-        <Column field='code' header='ID' sortable></Column>
-        <Column field='name_related' header='Nombre asignado' sortable></Column>
-        <Column field='company' header='Empresa' sortable></Column>
-        <Column field='email' header='Email' sortable></Column>
-        <Column field='phone' header='Telefono' sortable></Column>
-        <Column field='status' header='Estatus' body={statusBodyTemplate} sortable></Column>
-        <Column field='last_service_date' header='Servicio Realizado' sortable></Column>
+        <Column field='id' header='ID' sortable />
+        <Column field='name' header='Nombre asignado' sortable />
+        <Column field='rfc' header='RFC' sortable />
+        <Column field='email' header='Email' sortable />
+        <Column field='phone' header='Teléfono' sortable />
+        <Column field='status' header='Estatus' body={statusBodyTemplate} sortable />
+        <Column field='last_service_date' header='Servicio Realizado' sortable />
       </DataTable>
-      <Paginator
-        first={first}
-        rows={rows}
-        totalRecords={120}
-        rowsPerPageOptions={[15, 20, 30]}
-        onPageChange={onPageChange}
-      />
+
+      {totalRecords > 10 && (
+        <div className='pt-4'>
+          <Paginator
+            first={first}
+            rows={rows}
+            totalRecords={totalRecords}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
     </div>
   )
 }

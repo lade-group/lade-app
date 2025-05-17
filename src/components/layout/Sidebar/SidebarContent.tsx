@@ -5,6 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { routes } from '../../../constants/SidebarRoutes'
+import { useAuth } from '../../../core/contexts/AuthContext'
 
 const SidebarContent = ({
   isCollapsed,
@@ -13,6 +14,7 @@ const SidebarContent = ({
   isCollapsed: boolean
   setIsCollapsed: any
 }) => {
+  const { logOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [openMenus, setOpenMenus] = useState<string | null>(null)
@@ -111,7 +113,7 @@ const SidebarContent = ({
       <div>
         <Divider variant='middle' />
         <span
-          onClick={() => navigate('/')}
+          onClick={() => logOut()}
           className='text-primary flex items-center px-4 py-2 m-2 rounded-lg text-lg font-semibold hover:bg-primary hover:text-secondary cursor-pointer'
         >
           <LogoutIcon />
