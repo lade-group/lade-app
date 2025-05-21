@@ -1,44 +1,37 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-
 import VehicleStatusTag from '../../../ui/Tag/VehicleStatusTag'
 import VehicleFilterBar from './VehicleFilterBar'
-import { useInfiniteVehicles } from '../../../../core/hooks/useInfiniteVehicles'
-import { useAuth } from '../../../../core/contexts/AuthContext'
 import LayoutToggle from '../../../ui/ButtonGroup/LayoutVehicleButtonGroup'
+import { useVehicle } from '../../../../core/contexts/VehicleContext'
+import TruckImage from '../../../../assets/images/truck.jpg'
 
 export type VehicleStatus = 'DISPONIBLE' | 'EN_USO' | 'MANTENIMIENTO' | 'CANCELADO' | 'DESUSO'
 
 const vehicleStatusMap: Record<string, VehicleStatus> = {
-  ACTIVE: 'DISPONIBLE',
-  PENDING: 'EN_USO',
-  EXPIRED: 'MANTENIMIENTO',
-  CANCELLED: 'CANCELADO',
-  DESUSO: 'DESUSO', // por si llega uno inválido o nulo
+  DISPONIBLE: 'DISPONIBLE',
+  EN_USO: 'EN_USO',
+  MANTENIMIENTO: 'MANTENIMIENTO',
+  CANCELADO: 'CANCELADO',
+  DESUSO: 'DESUSO',
 }
 
 const VehicleList = () => {
   const [layout, setLayout] = useState<'grid' | 'list'>('grid')
-  const [filters, setFilters] = useState<{ status?: string; type?: string }>({})
-  const { currentTeam } = useAuth()
   const navigate = useNavigate()
-
-  const { vehicles, fetchMore, hasMore } = useInfiniteVehicles({
-    teamId: currentTeam?.id || '',
-    filters,
-  })
+  const { vehicles, fetchMore, hasMore, loading } = useVehicle()
 
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
-    if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore) {
+    if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading) {
       fetchMore()
     }
   }
 
   return (
-    <div className=' h-[80vh] overflow-y-auto' onScroll={onScroll}>
-      <div className='grid grid-cols-2  mb-4'>
-        <VehicleFilterBar onFilterChange={setFilters} />
+    <div className='h-[80vh] overflow-y-auto' onScroll={onScroll}>
+      <div className='grid grid-cols-2 mb-4'>
+        <VehicleFilterBar />
         <LayoutToggle layout={layout} onChange={setLayout} />
       </div>
 
@@ -50,13 +43,13 @@ const VehicleList = () => {
               onClick={() => navigate(`/vehicles/${v.id}`)}
               className='flex gap-4 p-4 hover:bg-gray-50 cursor-pointer'
             >
-              <img src={v.imageUrl} alt={v.plate} className='w-36 h-24 object-cover rounded' />
+              <img src={TruckImage} alt={v.plate} className='w-36 h-24 object-cover rounded' />
               <div className='flex flex-col flex-1'>
                 <h2 className='text-lg font-bold'>{v.plate}</h2>
                 <p className='text-sm text-gray-600'>
                   {v.brand} · {v.model} · {v.type}
                 </p>
-                <VehicleStatusTag status={vehicleStatusMap[v.status] || 'DESUSO'} />
+                <VehicleStatusTag status={vehicleStatusMap[v.status]} />
               </div>
             </div>
           ))}
@@ -69,7 +62,7 @@ const VehicleList = () => {
               onClick={() => navigate(`/vehicles/${v.id}`)}
               className='cursor-pointer border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition duration-300 bg-white flex flex-col items-center overflow-hidden'
             >
-              <img src={v.imageUrl} alt={v.plate} className='w-full h-40 object-cover' />
+              <img src={TruckImage} alt={v.plate} className='w-full h-40 object-cover' />
               <div className='p-4 text-center space-y-2 w-full'>
                 <h2 className='text-lg font-bold text-gray-800'>{v.plate}</h2>
                 <p className='text-sm text-gray-500'>

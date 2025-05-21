@@ -1,25 +1,37 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator'
 import { DataTable, DataTableSelectEvent } from 'primereact/datatable'
 import { Column } from 'primereact/column'
+import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator'
 import { TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material'
-import { ROUTES } from '../../../../constants/routes'
-import { useState } from 'react'
-import { useClientContext } from '../../../../core/contexts/ClientContext'
 import ClientStatusTag from '../../../ui/Tag/StatusTag'
+import { useClientStore } from '../../../../core/store/ClientStore'
+import { ROUTES } from '../../../../constants/routes'
 
 const ClientListTable = () => {
   const navigate = useNavigate()
-  const { clients, totalRecords, search, statusFilter, setSearch, setStatusFilter } =
-    useClientContext()
 
-  const [first, setFirst] = useState(0)
-  const [rows, setRows] = useState(10)
-  const [selectedClient, setSelectedClient] = useState<any>(null)
+  // Zustant store state and actions
+  const {
+    clients,
+    totalRecords,
+    search,
+    statusFilter,
+    first,
+    rows,
+    loading,
+    setSearch,
+    setStatusFilter,
+    setPagination,
+    fetchClients,
+  } = useClientStore()
+
+  useEffect(() => {
+    fetchClients()
+  }, [first, rows, search, statusFilter])
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {
-    setFirst(event.first)
-    setRows(event.rows)
+    setPagination(event.first, event.rows)
   }
 
   const rowSelected = (e: DataTableSelectEvent) => {
@@ -52,8 +64,9 @@ const ClientListTable = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <MenuItem value=''>Todos</MenuItem>
-            <MenuItem value='ACTIVE'>Activo</MenuItem>
-            <MenuItem value='CANCELLED'>Desactivado</MenuItem>
+            <MenuItem value='ACTIVO'>Activo</MenuItem>
+            <MenuItem value='DESACTIVADO'>Desactivado</MenuItem>
+            <MenuItem value='ELIMINADO'>Eliminado</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -64,12 +77,11 @@ const ClientListTable = () => {
         removableSort
         sortMode='multiple'
         tableStyle={{ minWidth: '70rem' }}
-        selection={selectedClient}
-        onSelectionChange={(e) => setSelectedClient(e.value)}
         selectionMode='single'
         onRowSelect={rowSelected}
         scrollable
         scrollHeight='flex'
+        loading={loading}
       >
         <Column field='id' header='ID' sortable />
         <Column field='name' header='Nombre asignado' sortable />
@@ -77,10 +89,11 @@ const ClientListTable = () => {
         <Column field='email' header='Email' sortable />
         <Column field='phone' header='Teléfono' sortable />
         <Column field='status' header='Estatus' body={statusBodyTemplate} sortable />
-        <Column field='last_service_date' header='Servicio Realizado' sortable />
+        <Column field='last_service_date' header='Último servicio' sortable />
       </DataTable>
 
-      {totalRecords > 10 && (
+      {/* Paginación */}
+      {totalRecords > rows && (
         <div className='pt-4'>
           <Paginator
             first={first}

@@ -1,33 +1,23 @@
-import { useEffect, useState } from 'react'
+// VehicleFilterBar.tsx
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { useVehicle } from '../../../../core/contexts/VehicleContext'
 
-interface Props {
-  onFilterChange: (filters: { status?: string; type?: string }) => void
-}
-
-const VehicleFilterBar = ({ onFilterChange }: Props) => {
-  const [statusOptions, setStatusOptions] = useState<string[]>([])
-  const [typeOptions, setTypeOptions] = useState<string[]>([])
-  const [filters, setFilters] = useState<{ status?: string; type?: string }>({})
-
-  useEffect(() => {
-    const fetchFilters = async () => {
-      const res = await fetch('http://localhost:3000/vehicle/filters')
-      const json = await res.json()
-      setStatusOptions(json.statusOptions)
-      setTypeOptions(json.typeOptions)
-    }
-    fetchFilters()
-  }, [])
+const VehicleFilterBar = () => {
+  const { filters, setFilters, statusOptions, typeOptions } = useVehicle()
 
   const handleChange = (key: 'status' | 'type', value: string) => {
-    const newFilters = { ...filters, [key]: value }
+    const newFilters = { ...filters, [key]: value || undefined }
     setFilters(newFilters)
-    onFilterChange(newFilters)
   }
 
+  const format = (status: string) =>
+    status
+      .replace('_', ' ')
+      .toLowerCase()
+      .replace(/^\w/, (c) => c.toUpperCase())
+
   return (
-    <div className='flex items-center justify-start w-full  gap-4 '>
+    <div className='flex items-center justify-start w-full gap-4'>
       <FormControl size='small' className='w-full'>
         <InputLabel id='status-label'>Estatus</InputLabel>
         <Select
@@ -39,7 +29,7 @@ const VehicleFilterBar = ({ onFilterChange }: Props) => {
           <MenuItem value=''>Todos</MenuItem>
           {statusOptions.map((status) => (
             <MenuItem key={status} value={status}>
-              {status}
+              {format(status)}
             </MenuItem>
           ))}
         </Select>

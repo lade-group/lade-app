@@ -11,13 +11,14 @@ import {
 } from '@mui/material'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import { useAuth } from '../../../../core/contexts/AuthContext'
-import { useClientContext } from '../../../../core/contexts/ClientContext'
+import { useClientStore } from '../../../../core/store/ClientStore'
 
 const DialogCreateClients = () => {
   const [visible, setVisible] = useState(false)
-  const { createClient } = useClientContext()
+  const createClient = useClientStore((state) => state.createClient)
   const { currentTeam } = useAuth()
 
+  // Campos formulario
   const [clientType, setClientType] = useState('')
   const [nombreFiscal, setNombreFiscal] = useState('')
   const [nombreReferencia, setNombreReferencia] = useState('')
@@ -39,17 +40,19 @@ const DialogCreateClients = () => {
   }
 
   const handleSubmit = async () => {
+    if (!currentTeam) return // Manejar error
+
     const payload = {
       name: nombreFiscal,
       name_related: nombreReferencia,
       rfc,
       description: descripcion,
-      email: 'correo@email.com',
+      email: 'correo@email.com', // Ajustar si tienes inputs reales para email y phone
       phone: '0000000000',
       cfdiUse: 'G03',
       taxRegime: '601',
       zipCode: postalCode,
-      teamId: currentTeam?.id,
+      teamId: currentTeam.id,
       address: {
         street,
         exterior_number: exteriorNumber,
@@ -60,13 +63,28 @@ const DialogCreateClients = () => {
         country,
         postal_code: postalCode,
       },
-      contacts: [],
+      contacts: [], // Podrías agregar aquí el manejo de contactos si quieres
     }
 
     const success = await createClient(payload)
+
     if (success) {
       setVisible(false)
-      // Opcional: limpiar inputs
+      // Limpieza opcional de inputs
+      setNombreFiscal('')
+      setNombreReferencia('')
+      setRfc('')
+      setCurp('')
+      setDescripcion('')
+      setStreet('')
+      setExteriorNumber('')
+      setInteriorNumber('')
+      setNeighborhood('')
+      setCity('')
+      setState('')
+      setCountry('México')
+      setPostalCode('')
+      setClientType('')
     }
   }
 
@@ -91,7 +109,7 @@ const DialogCreateClients = () => {
   return (
     <div className='card flex justify-content-center'>
       <div
-        className='bg-primary hover:bg-primary-hover text-white text-center font-medium px-6 py-3 w-full rounded-md transition'
+        className='bg-primary hover:bg-primary-hover text-white text-center font-medium px-6 py-3 w-full rounded-md transition cursor-pointer'
         onClick={() => setVisible(true)}
         id='create-client-button'
       >

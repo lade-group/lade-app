@@ -11,7 +11,7 @@ const UnitsPage = () => {
           <DialogCreateVehicle />
         </div>
         <div>
-          <span className='text-lg'>Maneja a los pilotos de tus unidades</span>
+          <span className='text-lg'>Gestiona tus unidades</span>
         </div>
         <div className='h-full w-full pt-10'>
           <VehicleList />

@@ -10,9 +10,10 @@ import { NotificationProvider } from './core/contexts/NotificationContext'
 import { APIProvider } from '@vis.gl/react-google-maps'
 
 // Context
-
 import AuthProvider from './core/contexts/AuthContext'
-import ClientProvider from './core/contexts/ClientContext'
+import VehicleProvider from './core/contexts/VehicleContext'
+import DriverProvider from './core/contexts/DriverContext'
+
 // Styles
 
 import 'primereact/resources/themes/lara-light-blue/theme.css'
@@ -33,9 +34,11 @@ createRoot(document.getElementById('root')!).render(
             <NotificationProvider>
               <APIProvider apiKey={'AIzaSyAoA48PKTl6pgEa0P5lILzXNbZu2m2PjZs'}>
                 <AuthProvider>
-                  <ClientProvider>
-                    <Router />
-                  </ClientProvider>
+                  <VehicleProvider>
+                    <DriverProvider>
+                      <Router />
+                    </DriverProvider>
+                  </VehicleProvider>
                 </AuthProvider>
               </APIProvider>
             </NotificationProvider>

@@ -1,3 +1,4 @@
+// DialogCreateVehicle.tsx
 import { useState } from 'react'
 import { Dialog } from 'primereact/dialog'
 import {
@@ -10,57 +11,30 @@ import {
   FormControl,
 } from '@mui/material'
 import DriveEtaIcon from '@mui/icons-material/DriveEta'
-import { useAuth } from '../../../../core/contexts/AuthContext'
-
-const statusOptions = [
-  { value: 'DISPONIBLE', label: 'Disponible' },
-  { value: 'EN_USO', label: 'En uso' },
-  { value: 'MANTENIMIENTO', label: 'Mantenimiento' },
-  { value: 'CANCELADO', label: 'Cancelado' },
-  { value: 'DESUSO', label: 'Desuso' },
-]
+import { useVehicle } from '../../../../core/contexts/VehicleContext'
 
 const DialogCreateVehicle = () => {
   const [visible, setVisible] = useState(false)
-  const { currentTeam } = useAuth()
-
   const [plate, setPlate] = useState('')
   const [brand, setBrand] = useState('')
   const [model, setModel] = useState('')
   const [type, setType] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [status, setStatus] = useState('DISPONIBLE')
+  const [year, setYear] = useState('')
+
+  const { createVehicle, statusOptions } = useVehicle()
 
   const handleSubmit = async () => {
-    if (!currentTeam?.id) return
-
-    const payload = {
-      teamId: currentTeam.id,
-      plate,
-      brand,
-      model,
-      type,
-      imageUrl,
-      status,
-    }
-
-    try {
-      const res = await fetch('http://localhost:3000/vehicle', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!res.ok) throw new Error('Error al crear vehículo')
-
-      setVisible(false)
-      // 🚨 Opcional: limpiar campos y/o notificar
-    } catch (err) {
-      console.error(err)
-    }
+    await createVehicle({ plate, brand, model, type, imageUrl, status, year })
+    setVisible(false)
+    setPlate('')
+    setBrand('')
+    setModel('')
+    setType('')
+    setImageUrl('')
+    setYear('')
+    setStatus('DISPONIBLE')
   }
 
   const footerContent = (
@@ -83,12 +57,12 @@ const DialogCreateVehicle = () => {
 
   return (
     <div>
-      <div
+      <button
         className='bg-primary hover:bg-primary-hover text-white text-center font-medium px-6 py-3 w-full rounded-md transition cursor-pointer'
         onClick={() => setVisible(true)}
       >
         Agregar Vehículo
-      </div>
+      </button>
 
       <Dialog
         header={headerContent}
@@ -129,6 +103,12 @@ const DialogCreateVehicle = () => {
               onChange={(e) => setImageUrl(e.target.value)}
               fullWidth
             />
+            <TextField
+              label='Año'
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              fullWidth
+            />
 
             <FormControl fullWidth>
               <InputLabel id='status-label'>Estatus</InputLabel>
@@ -139,8 +119,11 @@ const DialogCreateVehicle = () => {
                 onChange={(e: SelectChangeEvent) => setStatus(e.target.value)}
               >
                 {statusOptions.map((opt) => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    {opt.label}
+                  <MenuItem key={opt} value={opt}>
+                    {opt
+                      .replace('_', ' ')
+                      .toLowerCase()
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </MenuItem>
                 ))}
               </Select>
