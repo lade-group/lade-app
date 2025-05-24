@@ -1,20 +1,20 @@
-// DialogCreateDriver.tsx
 import { useState } from 'react'
 import { Dialog } from 'primereact/dialog'
 import {
   Button,
   TextField,
-  MenuItem,
-  InputLabel,
-  Select,
   FormControl,
+  MenuItem,
+  Select,
+  InputLabel,
   SelectChangeEvent,
 } from '@mui/material'
-import { useDriver } from '../../../../core/contexts/DriverContext'
+import { useDriverStore } from '../../../../core/store/DriverStore'
 
 export type ContactTypeOption = 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
 
 const contactTypeOptions: ContactTypeOption[] = ['EMAIL', 'PHONE', 'FAX', 'OTHER']
+
 
 const DialogCreateDriver = () => {
   const [visible, setVisible] = useState(false)
@@ -25,21 +25,23 @@ const DialogCreateDriver = () => {
   const [address, setAddress] = useState({ street: '', city: '', state: '', zip: '' })
   const [contacts, setContacts] = useState<{ type: ContactTypeOption; value: string }[]>([])
 
-  const { createDriver, statusOptions } = useDriver()
+  const { createDriver, statusOptions } = useDriverStore()
 
   const handleAddContact = () => {
     setContacts([...contacts, { type: 'PHONE', value: '' }])
   }
 
   const handleSubmit = async () => {
-    await createDriver({
+    const newDriver = {
+      id: new Date().toISOString(), // Genera un id único
       name,
       photoUrl,
       licenseNumber,
       status,
       address,
       contacts,
-    })
+    }
+    await createDriver(newDriver)
     setVisible(false)
     setName('')
     setPhotoUrl('')
@@ -50,7 +52,7 @@ const DialogCreateDriver = () => {
   }
 
   const headerContent = (
-    <div className='flex gap-3  p-10'>
+    <div className='flex gap-3 p-10'>
       <span className='text-xl font-medium'>Agregar Conductor</span>
     </div>
   )

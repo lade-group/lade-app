@@ -43,7 +43,7 @@ interface ClientStore {
   setSearch: (search: string) => void
   setStatusFilter: (status: string) => void
   setPagination: (first: number, rows: number) => void
-  fetchClients: () => Promise<void>
+  fetchClients: (teamId: string) => Promise<void>
   createClient: (payload: Client) => Promise<boolean>
   // Opcional: más métodos como updateClient, deleteClient...
 }
@@ -62,13 +62,14 @@ export const useClientStore = create<ClientStore>()(
     setStatusFilter: (status) => set({ statusFilter: status, first: 0 }), // reset page on filter change
     setPagination: (first, rows) => set({ first, rows }),
 
-    fetchClients: async () => {
+    fetchClients: async (teamId: string) => {
       set({ loading: true })
       const { first, rows, search, statusFilter } = get()
       try {
         const params = new URLSearchParams()
-        params.append('skip', String(first))
-        params.append('take', String(rows))
+        params.append('page', String(first / rows + 1))
+        params.append('limit', String(rows))
+        params.append('teamId', teamId)
         if (search.trim()) params.append('search', search.trim())
         if (statusFilter) params.append('status', statusFilter)
 
@@ -79,7 +80,6 @@ export const useClientStore = create<ClientStore>()(
         if (!res.ok) throw new Error('Error fetching clients')
 
         const json = await res.json()
-
         set({
           clients: json.data,
           totalRecords: json.total,

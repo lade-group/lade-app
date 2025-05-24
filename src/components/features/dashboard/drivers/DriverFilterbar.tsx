@@ -1,37 +1,31 @@
+import { useDriverStore } from '../../../../core/store/DriverStore'
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import { useDriver } from '../../../../core/contexts/DriverContext'
-import { DriverStatus } from '../../../../core/contexts/DriverContext'
 
 const DriverFilterBar = () => {
-  const { filters, setFilters, statusOptions } = useDriver()
+  const { filters, setFilters } = useDriverStore()
 
-  const handleChange = (value: string) => {
-    setFilters({ status: value as DriverStatus })
+  const handleStatusChange = (value: string) => {
+    setFilters({ status: value as 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO' })
   }
 
-  const format = (status: string) =>
-    status
-      .replace('_', ' ')
-      .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase())
-
   return (
-    <FormControl size='small' fullWidth>
-      <InputLabel id='status-label'>Estatus</InputLabel>
-      <Select
-        labelId='status-label'
-        value={filters.status || ''}
-        label='Estatus'
-        onChange={(e: SelectChangeEvent) => handleChange(e.target.value)}
-      >
-        <MenuItem value=''>Todos</MenuItem>
-        {statusOptions.map((status) => (
-          <MenuItem key={status} value={status}>
-            {format(status)}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <div className='flex gap-4'>
+      {/* Filtro de Estatus */}
+      <FormControl size='small' className='w-48'>
+        <InputLabel id='status-label'>Estatus</InputLabel>
+        <Select
+          labelId='status-label'
+          value={filters.status || ''}
+          label='Estatus'
+          onChange={(e: SelectChangeEvent) => handleStatusChange(e.target.value)}
+        >
+          <MenuItem value=''>Todos</MenuItem>
+          <MenuItem value='DISPONIBLE'>Disponible</MenuItem>
+          <MenuItem value='EN_VIAJE'>En Viaje</MenuItem>
+          <MenuItem value='DESACTIVADO'>Desactivado</MenuItem>
+        </Select>
+      </FormControl>
+    </div>
   )
 }
 

@@ -1,12 +1,12 @@
 import Tag from './Tag'
 
 interface ClientStatusTagProps {
-  status: 'ACTIVE' | 'DESACTIVADO' | 'ELIMINADO'
+  status: 'ACTIVO' | 'DESACTIVADO' | 'ELIMINADO'
   mini?: boolean
 }
 
 const statusColorMap: Record<string, string> = {
-  ACTIVE: 'bg-green-100 text-green-800',
+  ACTIVO: 'bg-green-100 text-green-800',
   DESACTIVADO: 'bg-yellow-100 text-yellow-800',
   ELIMINADO: 'bg-red-100 text-red-800',
 }
