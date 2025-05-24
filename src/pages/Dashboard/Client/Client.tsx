@@ -30,7 +30,7 @@ interface ClientData {
   rfc: string
   email: string
   phone: string
-  status: 'ACTIVO' | 'DESACTIVADO' | 'ELIMINADO'
+  status: 'ACTIVE' | 'CANCELLED' | 'DELETED'
   description?: string
   cfdiUse: string
   taxRegime: string
@@ -50,9 +50,9 @@ interface ClientData {
 }
 
 const Status = {
-  ACTIVO: 'ACTIVO',
-  DESACTIVADO: 'DESACTIVADO',
-  ELIMINADO: 'ELIMINADO',
+  ACTIVE: 'ACTIVE',
+  CANCELLED: 'CANCELLED',
+  DELETED: 'DELETED',
 } as const
 
 const ClientPage = () => {
@@ -119,9 +119,9 @@ const ClientPage = () => {
               <FormControl fullWidth>
                 <InputLabel id='status-label'>Estatus</InputLabel>
                 <Select labelId='status-label' value={client.status} label='Estatus'>
-                  <MenuItem value='Activo'>Activo</MenuItem>
-                  <MenuItem value='Desactivado'>Desactivado</MenuItem>
-                  <MenuItem value='Eliminado'>Eliminado</MenuItem>
+                  <MenuItem value='ACTIVE'>Activo</MenuItem>
+                  <MenuItem value='CANCELLED'>Desactivado</MenuItem>
+                  <MenuItem value='DELETED'>Eliminado</MenuItem>
                 </Select>
               </FormControl>
             </>

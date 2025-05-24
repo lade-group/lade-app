@@ -7,11 +7,12 @@ import { TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/mater
 import ClientStatusTag from '../../../ui/Tag/StatusTag'
 import { useClientStore } from '../../../../core/store/ClientStore'
 import { ROUTES } from '../../../../constants/routes'
+import { useNotification } from '../../../../core/contexts/NotificationContext'
 
 const ClientListTable = () => {
   const navigate = useNavigate()
+  const { showNotification } = useNotification()
 
-  // Zustant store state and actions
   const {
     clients,
     totalRecords,
@@ -27,7 +28,13 @@ const ClientListTable = () => {
   } = useClientStore()
 
   useEffect(() => {
-    fetchClients()
+    let currentTeam = localStorage.getItem('TeamID')
+
+    if (!currentTeam) {
+      showNotification('No se ha podido cargar el equipo actual.', 'error')
+      return
+    }
+    fetchClients(currentTeam)
   }, [first, rows, search, statusFilter])
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {

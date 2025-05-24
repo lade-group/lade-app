@@ -40,6 +40,8 @@ const DialogCreateClients = () => {
   }
 
   const handleSubmit = async () => {
+    console.log('Submitting form...')
+    console.log('currentTeam', currentTeam)
     if (!currentTeam) return // Manejar error
 
     const payload = {
@@ -65,7 +67,7 @@ const DialogCreateClients = () => {
       },
       contacts: [], // Podrías agregar aquí el manejo de contactos si quieres
     }
-
+    console.log('Payload:', payload)
     const success = await createClient(payload)
 
     if (success) {

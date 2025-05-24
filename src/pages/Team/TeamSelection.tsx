@@ -41,6 +41,8 @@ const TeamNotFoundPage = () => {
   const handleEnterTeam = (team: Team) => {
     console.log(team)
     setCurrentTeam(team)
+    localStorage.setItem('TeamID', team.id)
+    localStorage.setItem('TeamName', team.name)
     navigation('/dashboard')
   }
 

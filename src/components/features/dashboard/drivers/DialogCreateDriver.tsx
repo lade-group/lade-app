@@ -12,42 +12,69 @@ import {
 import { useDriverStore } from '../../../../core/store/DriverStore'
 
 export type ContactTypeOption = 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
+export type DriverStatus = 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO'
 
 const contactTypeOptions: ContactTypeOption[] = ['EMAIL', 'PHONE', 'FAX', 'OTHER']
-
+const driverStatusOptions: DriverStatus[] = ['DISPONIBLE', 'EN_VIAJE', 'DESACTIVADO']
 
 const DialogCreateDriver = () => {
   const [visible, setVisible] = useState(false)
   const [name, setName] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
   const [licenseNumber, setLicenseNumber] = useState('')
-  const [status, setStatus] = useState<'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO'>('DISPONIBLE')
-  const [address, setAddress] = useState({ street: '', city: '', state: '', zip: '' })
+  const [status, setStatus] = useState<DriverStatus>('DISPONIBLE')
+  const [address, setAddress] = useState({
+    street: '',
+    exterior_number: '',
+    interior_number: '',
+    neighborhood: '',
+    city: '',
+    state: '',
+    country: 'México',
+    postal_code: '',
+  })
   const [contacts, setContacts] = useState<{ type: ContactTypeOption; value: string }[]>([])
 
-  const { createDriver, statusOptions } = useDriverStore()
+  const { createDriver } = useDriverStore()
 
   const handleAddContact = () => {
     setContacts([...contacts, { type: 'PHONE', value: '' }])
   }
 
   const handleSubmit = async () => {
+    const currentTeam = localStorage.getItem('TeamID')
+
+    if (!currentTeam) {
+      console.error('No current team found')
+      return
+    }
+
     const newDriver = {
-      id: new Date().toISOString(), // Genera un id único
       name,
       photoUrl,
       licenseNumber,
-      status,
       address,
       contacts,
+      teamId: currentTeam,
+      status,
     }
+
     await createDriver(newDriver)
     setVisible(false)
     setName('')
     setPhotoUrl('')
     setLicenseNumber('')
     setStatus('DISPONIBLE')
-    setAddress({ street: '', city: '', state: '', zip: '' })
+    setAddress({
+      street: '',
+      exterior_number: '',
+      interior_number: '',
+      neighborhood: '',
+      city: '',
+      state: '',
+      country: '',
+      postal_code: '',
+    })
     setContacts([])
   }
 
@@ -74,10 +101,11 @@ const DialogCreateDriver = () => {
       >
         Agregar Conductor
       </button>
+
       <Dialog
         header={headerContent}
         visible={visible}
-        style={{ width: '50vw' }}
+        style={{ width: '60vw' }}
         onHide={() => setVisible(false)}
         footer={footerContent}
       >
@@ -100,9 +128,9 @@ const DialogCreateDriver = () => {
               labelId='status-label'
               value={status}
               label='Estatus'
-              onChange={(e: SelectChangeEvent) => setStatus(e.target.value as any)}
+              onChange={(e: SelectChangeEvent) => setStatus(e.target.value as DriverStatus)}
             >
-              {statusOptions.map((opt) => (
+              {driverStatusOptions.map((opt) => (
                 <MenuItem key={opt} value={opt}>
                   {opt}
                 </MenuItem>
@@ -116,19 +144,19 @@ const DialogCreateDriver = () => {
             onChange={(e) => setAddress({ ...address, street: e.target.value })}
           />
           <TextField
-            label='Numero Interior'
-            value={address.street}
-            onChange={(e) => setAddress({ ...address, street: e.target.value })}
+            label='Número Exterior'
+            value={address.exterior_number}
+            onChange={(e) => setAddress({ ...address, exterior_number: e.target.value })}
           />
           <TextField
-            label='Numero Exterior'
-            value={address.street}
-            onChange={(e) => setAddress({ ...address, street: e.target.value })}
+            label='Número Interior'
+            value={address.interior_number}
+            onChange={(e) => setAddress({ ...address, interior_number: e.target.value })}
           />
           <TextField
             label='Colonia'
-            value={address.street}
-            onChange={(e) => setAddress({ ...address, street: e.target.value })}
+            value={address.neighborhood}
+            onChange={(e) => setAddress({ ...address, neighborhood: e.target.value })}
           />
           <TextField
             label='Ciudad'
@@ -141,14 +169,14 @@ const DialogCreateDriver = () => {
             onChange={(e) => setAddress({ ...address, state: e.target.value })}
           />
           <TextField
-            label='Pais'
-            value={address.state}
-            onChange={(e) => setAddress({ ...address, state: e.target.value })}
+            label='País'
+            value={address.country}
+            onChange={(e) => setAddress({ ...address, country: e.target.value })}
           />
           <TextField
             label='Código Postal'
-            value={address.zip}
-            onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+            value={address.postal_code}
+            onChange={(e) => setAddress({ ...address, postal_code: e.target.value })}
           />
 
           <div className='col-span-2'>
@@ -156,8 +184,10 @@ const DialogCreateDriver = () => {
             {contacts.map((c, i) => (
               <div key={i} className='grid grid-cols-2 gap-2 mt-2'>
                 <FormControl>
+                  <InputLabel>Tipo</InputLabel>
                   <Select
                     value={c.type}
+                    label='Tipo'
                     onChange={(e: SelectChangeEvent) => {
                       const updated = [...contacts]
                       updated[i].type = e.target.value as ContactTypeOption
@@ -172,6 +202,7 @@ const DialogCreateDriver = () => {
                   </Select>
                 </FormControl>
                 <TextField
+                  label='Valor'
                   value={c.value}
                   onChange={(e) => {
                     const updated = [...contacts]

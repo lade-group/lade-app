@@ -4,36 +4,55 @@ import { Button, CircularProgress } from '@mui/material'
 import DriverStatusTag from '../../../ui/Tag/DriverStatusTag'
 import DriverFilterBar from './DriverFilterbar'
 import LayoutToggle from '../../../ui/ButtonGroup/LayoutVehicleButtonGroup'
-import { useAuth } from '../../../../core/contexts/AuthContext'
-
+import { useNotification } from '../../../../core/contexts/NotificationContext'
 
 import driverImg from '../../../../assets/images/dered.jpg'
 
 const DriverList = () => {
-  const {currentTeam} = useAuth()
+  const { showNotification } = useNotification()
   const [layout, setLayout] = useState<'grid' | 'list'>('grid')
-  const {
-    drivers,
-    totalRecords,
-    filters,
-    fetchDrivers,
-    loading,
-    hasMore,
-    first,
-    rows,
-    setPagination,
-  } = useDriverStore()
+  const { drivers, filters, fetchDrivers, loading, hasMore, first, rows, setPagination } =
+    useDriverStore()
 
   useEffect(() => {
-    fetchDrivers()
+    let currentTeam = localStorage.getItem('TeamID')
+
+    if (!currentTeam) {
+      showNotification('No se ha podido cargar los Conductores actuales.', 'error')
+      return
+    }
+
+    fetchDrivers(currentTeam)
   }, [first, rows, filters])
 
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    let currentTeam = localStorage.getItem('TeamID')
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
     if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading) {
       setPagination(first + rows, rows)
-      fetchDrivers()
+
+      if (!currentTeam) {
+        showNotification('No se ha podido cargar los Conductores actuales.', 'error')
+        return
+      }
+      fetchDrivers(currentTeam)
     }
+  }
+
+  if (loading && drivers.length === 0) {
+    return (
+      <div className='flex justify-center items-center h-[80vh]'>
+        <CircularProgress />
+      </div>
+    )
+  }
+
+  if (drivers.length === 0) {
+    return (
+      <div className='flex justify-center items-center h-[80vh]'>
+        <p className='text-gray-500'>No hay conductores disponibles.</p>
+      </div>
+    )
   }
 
   return (

@@ -20,7 +20,7 @@ export interface Client {
   rfc: string
   email: string
   phone: string
-  status?: 'ACTIVO' | 'DESACTIVADO' | 'ELIMINADO'
+  status?: 'ACTIVE' | 'CANCELLED' | 'DELETED'
   description?: string
   cfdiUse?: string
   taxRegime?: string
@@ -63,6 +63,8 @@ export const useClientStore = create<ClientStore>()(
     setPagination: (first, rows) => set({ first, rows }),
 
     fetchClients: async (teamId: string) => {
+      if (!teamId) return
+
       set({ loading: true })
       const { first, rows, search, statusFilter } = get()
       try {
@@ -91,7 +93,7 @@ export const useClientStore = create<ClientStore>()(
       }
     },
 
-    createClient: async (payload) => {
+    createClient: async (payload: any) => {
       try {
         const res = await fetch('http://localhost:3000/client', {
           method: 'POST',
@@ -103,7 +105,7 @@ export const useClientStore = create<ClientStore>()(
         })
 
         if (!res.ok) throw new Error('Error creating client')
-        await get().fetchClients()
+        await get().fetchClients(payload.teamId)
         return true
       } catch (error) {
         console.error('Create client error:', error)

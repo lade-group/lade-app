@@ -152,6 +152,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const logOut = (): void => {
     localStorage.removeItem('token')
+    localStorage.removeItem('currentTeam')
     setCurrentUser(null)
     showNotification('Sesión cerrada', 'success')
     navigate('/')
