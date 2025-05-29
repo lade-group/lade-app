@@ -8,7 +8,7 @@ export interface Driver {
   name: string
   photoUrl: string
   licenseNumber: string
-  status: 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO'
+  status: DriverStatus
   teamId: string
   address: {
     street: string

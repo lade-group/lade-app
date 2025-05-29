@@ -34,6 +34,11 @@ const Driver = React.lazy(() => import('../pages/Dashboard/Drivers/Driver'))
 const Invoices = React.lazy(() => import('../pages/Dashboard/Invoices/Invoices'))
 
 const Units = React.lazy(() => import('../pages/Dashboard/Units/Units'))
+const Unit = React.lazy(() => import('../pages/Dashboard/Units/Unit'))
+
+const TeamUsers = React.lazy(() => import('../pages/Dashboard/Admin/Users'))
+
+const LogPage = React.lazy(() => import('../pages/Dashboard/Admin/Logs'))
 
 const NotFoundPage = React.lazy(() => import('../pages/General/NoFoundPage'))
 
@@ -86,6 +91,15 @@ function Router() {
 
             <Route path={ROUTES.UNIDADES}>
               <Route index element={<Units />} />
+              <Route path=':id' element={<Unit />} />
+            </Route>
+
+            <Route path={ROUTES.USUSARIOS}>
+              <Route index element={<TeamUsers />} />
+            </Route>
+
+            <Route path={ROUTES.HISTORIAL}>
+              <Route index element={<LogPage />} />
             </Route>
 
             <Route path={ROUTES.PERFIL} element={<Profile />} />

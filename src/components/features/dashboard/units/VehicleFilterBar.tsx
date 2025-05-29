@@ -1,20 +1,18 @@
-// VehicleFilterBar.tsx
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import { useVehicle } from '../../../../core/contexts/VehicleContext'
+import { useVehicleStore } from '../../../../core/store/VehicleStore'
 
 const VehicleFilterBar = () => {
-  const { filters, setFilters, statusOptions, typeOptions } = useVehicle()
+  const { filters, setFilters, statusOptions, typeOptions } = useVehicleStore()
 
   const handleChange = (key: 'status' | 'type', value: string) => {
-    const newFilters = { ...filters, [key]: value || undefined }
-    setFilters(newFilters)
+    setFilters({ ...filters, [key]: value || undefined })
   }
 
-  const format = (status: string) =>
-    status
-      .replace('_', ' ')
+  const format = (value: string) =>
+    value
+      .replace(/_/g, ' ')
       .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase())
+      .replace(/^\w|\s\w/g, (c) => c.toUpperCase())
 
   return (
     <div className='flex items-center justify-start w-full gap-4'>

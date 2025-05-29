@@ -12,7 +12,6 @@ import { APIProvider } from '@vis.gl/react-google-maps'
 // Context
 import AuthProvider from './core/contexts/AuthContext'
 import VehicleProvider from './core/contexts/VehicleContext'
-import DriverProvider from './core/contexts/DriverContext'
 
 // Styles
 
@@ -35,9 +34,7 @@ createRoot(document.getElementById('root')!).render(
               <APIProvider apiKey={'AIzaSyAoA48PKTl6pgEa0P5lILzXNbZu2m2PjZs'}>
                 <AuthProvider>
                   <VehicleProvider>
-                    <DriverProvider>
-                      <Router />
-                    </DriverProvider>
+                    <Router />
                   </VehicleProvider>
                 </AuthProvider>
               </APIProvider>

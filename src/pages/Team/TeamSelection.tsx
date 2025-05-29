@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../../core/contexts/AuthContext'
+import { useTeamStore } from '../../core/store/TeamStore'
 
 import { Team } from '../../types/teams'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-const TeamNotFoundPage = () => {
-  const { currentUser, setCurrentTeam, logOut } = useAuth()
+const TeamSelection = () => {
+  const { setCurrentTeam } = useTeamStore()
+  const { currentUser, logOut } = useAuth()
+
   const navigation = useNavigate()
   const [teams, setTeams] = useState<Team[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,10 +42,7 @@ const TeamNotFoundPage = () => {
   }
 
   const handleEnterTeam = (team: Team) => {
-    console.log(team)
     setCurrentTeam(team)
-    localStorage.setItem('TeamID', team.id)
-    localStorage.setItem('TeamName', team.name)
     navigation('/dashboard')
   }
 
@@ -149,4 +149,4 @@ const TeamNotFoundPage = () => {
   )
 }
 
-export default TeamNotFoundPage
+export default TeamSelection

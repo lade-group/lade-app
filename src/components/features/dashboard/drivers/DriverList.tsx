@@ -5,28 +5,29 @@ import DriverStatusTag from '../../../ui/Tag/DriverStatusTag'
 import DriverFilterBar from './DriverFilterbar'
 import LayoutToggle from '../../../ui/ButtonGroup/LayoutVehicleButtonGroup'
 import { useNotification } from '../../../../core/contexts/NotificationContext'
+import { useNavigate } from 'react-router'
 
 import driverImg from '../../../../assets/images/dered.jpg'
+import { useTeamStore } from '../../../../core/store/TeamStore'
 
 const DriverList = () => {
+  const navigate = useNavigate()
   const { showNotification } = useNotification()
+  const { currentTeam } = useTeamStore()
   const [layout, setLayout] = useState<'grid' | 'list'>('grid')
   const { drivers, filters, fetchDrivers, loading, hasMore, first, rows, setPagination } =
     useDriverStore()
 
   useEffect(() => {
-    let currentTeam = localStorage.getItem('TeamID')
-
-    if (!currentTeam) {
+    if (!currentTeam?.id) {
       showNotification('No se ha podido cargar los Conductores actuales.', 'error')
       return
     }
 
-    fetchDrivers(currentTeam)
+    fetchDrivers(currentTeam.id)
   }, [first, rows, filters])
 
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    let currentTeam = localStorage.getItem('TeamID')
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
     if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading) {
       setPagination(first + rows, rows)
@@ -35,7 +36,7 @@ const DriverList = () => {
         showNotification('No se ha podido cargar los Conductores actuales.', 'error')
         return
       }
-      fetchDrivers(currentTeam)
+      fetchDrivers(currentTeam.id)
     }
   }
 
@@ -72,7 +73,7 @@ const DriverList = () => {
                 className='w-24 h-24 rounded object-cover'
               /> */}
 
-              <img src={driverImg} alt={driver.name} className='w-full h-60 object-cover' />
+              <img src={driverImg} alt={driver.name} className='w-24 h-24 rounded object-cover' />
               <div className='flex flex-col flex-1'>
                 <h2 className='text-lg font-bold'>{driver.name}</h2>
                 <p className='text-sm text-gray-600'>Licencia: {driver.licenseNumber}</p>
@@ -86,7 +87,9 @@ const DriverList = () => {
           {drivers.map((driver) => (
             <div
               key={driver.id}
-              className='border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition bg-white flex flex-col items-center overflow-hidden'
+              onClick={() => navigate(`${driver.id}`)}
+              className='border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition bg-white flex flex-col items-center overflow-hidden
+              hover:cursor-pointer'
             >
               {/* <img
                 src={driver.photoUrl}

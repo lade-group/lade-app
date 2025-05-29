@@ -8,10 +8,12 @@ import ClientStatusTag from '../../../ui/Tag/StatusTag'
 import { useClientStore } from '../../../../core/store/ClientStore'
 import { ROUTES } from '../../../../constants/routes'
 import { useNotification } from '../../../../core/contexts/NotificationContext'
+import { useTeamStore } from '../../../../core/store/TeamStore'
 
 const ClientListTable = () => {
   const navigate = useNavigate()
   const { showNotification } = useNotification()
+  const { currentTeam } = useTeamStore()
 
   const {
     clients,
@@ -28,13 +30,11 @@ const ClientListTable = () => {
   } = useClientStore()
 
   useEffect(() => {
-    let currentTeam = localStorage.getItem('TeamID')
-
     if (!currentTeam) {
       showNotification('No se ha podido cargar el equipo actual.', 'error')
       return
     }
-    fetchClients(currentTeam)
+    fetchClients(currentTeam.id)
   }, [first, rows, search, statusFilter])
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {
@@ -71,9 +71,9 @@ const ClientListTable = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <MenuItem value=''>Todos</MenuItem>
-            <MenuItem value='ACTIVO'>Activo</MenuItem>
-            <MenuItem value='DESACTIVADO'>Desactivado</MenuItem>
-            <MenuItem value='ELIMINADO'>Eliminado</MenuItem>
+            <MenuItem value='ACTIVE'>Activo</MenuItem>
+            <MenuItem value='CANCELLED'>Desactivado</MenuItem>
+            <MenuItem value='DELETED'>Eliminado</MenuItem>
           </Select>
         </FormControl>
       </div>

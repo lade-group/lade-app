@@ -10,6 +10,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material'
 import { useDriverStore } from '../../../../core/store/DriverStore'
+import { useTeamStore } from '../../../../core/store/TeamStore'
 
 export type ContactTypeOption = 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
 export type DriverStatus = 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO'
@@ -18,6 +19,7 @@ const contactTypeOptions: ContactTypeOption[] = ['EMAIL', 'PHONE', 'FAX', 'OTHER
 const driverStatusOptions: DriverStatus[] = ['DISPONIBLE', 'EN_VIAJE', 'DESACTIVADO']
 
 const DialogCreateDriver = () => {
+  const { currentTeam } = useTeamStore()
   const [visible, setVisible] = useState(false)
   const [name, setName] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
@@ -42,8 +44,6 @@ const DialogCreateDriver = () => {
   }
 
   const handleSubmit = async () => {
-    const currentTeam = localStorage.getItem('TeamID')
-
     if (!currentTeam) {
       console.error('No current team found')
       return
@@ -55,7 +55,7 @@ const DialogCreateDriver = () => {
       licenseNumber,
       address,
       contacts,
-      teamId: currentTeam,
+      teamId: currentTeam.id,
       status,
     }
 

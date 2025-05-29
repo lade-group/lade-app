@@ -15,7 +15,7 @@ export const ROUTES = {
   FACTURAS: '/dashboard/invoices',
 
   // Routes for Units
-  UNIDADES: '/dashboard/all-units',
+  UNIDADES: '/dashboard/unidades',
 
   // Admin Routes
   AJUSTES_DE_EQUIPO: '/dashboard/settings-teams',
