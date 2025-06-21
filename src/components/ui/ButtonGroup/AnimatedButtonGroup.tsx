@@ -1,6 +1,5 @@
-import { IconButton, Button, Collapse, Box } from '@mui/material'
+import { IconButton, Collapse, Box } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import SaveIcon from '@mui/icons-material/Save'
 
 interface AnimatedButtonGroupProps {
   isEditing: boolean
@@ -20,9 +19,9 @@ const AnimatedButtonGroup = ({ isEditing, onToggleEditing }: AnimatedButtonGroup
           <IconButton onClick={onToggleEditing}>
             <CloseIcon />
           </IconButton>
-          <Button variant='outlined' startIcon={<SaveIcon />}>
+          <button className='bg-primary hover:bg-primary-hover text-white  font-medium px-6 py-3 w-full rounded-md  cursor-pointer'>
             Guardar
-          </Button>
+          </button>
         </div>
       </Collapse>
     </Box>

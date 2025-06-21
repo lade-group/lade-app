@@ -37,3 +37,15 @@ tr:nth-child(even) {
   display: inline-block;
 }
 
+.p-menuitem-content {
+  padding: 12px 24px !important;
+}
+
+.p-menu{
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.p-inputtext {
+  @apply w-full p-2 py-4 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary;
+}

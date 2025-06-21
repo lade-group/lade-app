@@ -1,38 +1,33 @@
-// src/stores/clientStore.ts
+// src/stores/tripsStore.ts
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-export interface ClientAddress {
-  street: string
-  exterior_number: string
-  interior_number?: string
-  neighborhood: string
-  city: string
-  state: string
-  country: string
-  postal_code: string
-}
-
-export interface Client {
+export interface Trip {
   id?: string
-  name: string
-  name_related?: string
-  rfc: string
-  email: string
-  phone: string
-  status?: 'ACTIVE' | 'CANCELLED' | 'DELETED'
-  description?: string
-  cfdiUse?: string
-  taxRegime?: string
-  zipCode?: string
-  creditLimit?: number
-  address: ClientAddress
-  contacts?: Array<{ id?: string; type: string; value: string }>
+  clientId: string
+  driverId: string
+  vehicleId: string
+  routeId: string
+  product: string
+  weightKg: number
+  price: number
+  startDate: string
+  endDate: string
+  status:
+    | 'PREINICIALIZADO'
+    | 'EN_PROCESO'
+    | 'FINALIZADO_A_TIEMPO'
+    | 'FINALIZADO_TARDIO'
+    | 'CANCELADO'
   teamId?: string
+  client?: { name: string }
+  driver?: { name: string }
+  vehicle?: { plate: string }
+  route?: { originCity: string; destinationCity: string }
 }
 
-interface ClientStore {
-  clients: Client[]
+interface TripStore {
+  trips: Trip[]
   totalRecords: number
   search: string
   statusFilter: string
@@ -40,16 +35,22 @@ interface ClientStore {
   rows: number
   loading: boolean
 
+  filters: {
+    clientName: string
+    status: string
+  }
+
+  setFilters: (filters: { clientName: string; status: string }) => void
   setSearch: (search: string) => void
   setStatusFilter: (status: string) => void
   setPagination: (first: number, rows: number) => void
-  fetchClients: (teamId: string) => Promise<void>
-  createClient: (payload: Client) => Promise<boolean>
+  fetchTrips: (teamId: string) => Promise<void>
+  createTrip: (payload: Trip) => Promise<boolean>
 }
 
-export const useClientStore = create<ClientStore>()(
+export const useTripsStore = create<TripStore>()(
   devtools((set, get) => ({
-    clients: [],
+    trips: [],
     totalRecords: 0,
     search: '',
     statusFilter: '',
@@ -57,13 +58,18 @@ export const useClientStore = create<ClientStore>()(
     rows: 10,
     loading: false,
 
-    setSearch: (search) => set({ search, first: 0 }), // reset page on search change
-    setStatusFilter: (status) => set({ statusFilter: status, first: 0 }), // reset page on filter change
+    filters: {
+      clientName: '',
+      status: '',
+    },
+    setFilters: (filters) => set({ filters, first: 0 }),
+
+    setSearch: (search) => set({ search, first: 0 }),
+    setStatusFilter: (status) => set({ statusFilter: status, first: 0 }),
     setPagination: (first, rows) => set({ first, rows }),
 
-    fetchClients: async (teamId: string) => {
+    fetchTrips: async (teamId: string) => {
       if (!teamId) return
-
       set({ loading: true })
       const { first, rows, search, statusFilter } = get()
       try {
@@ -74,15 +80,15 @@ export const useClientStore = create<ClientStore>()(
         if (search.trim()) params.append('search', search.trim())
         if (statusFilter) params.append('status', statusFilter)
 
-        const res = await fetch(`http://localhost:3000/client?${params.toString()}`, {
+        const res = await fetch(`http://localhost:3000/trip?${params.toString()}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
-        if (!res.ok) throw new Error('Error fetching clients')
+        if (!res.ok) throw new Error('Error fetching trips')
 
         const json = await res.json()
         set({
-          clients: json.data,
+          trips: json.data,
           totalRecords: json.total,
           loading: false,
         })
@@ -92,9 +98,9 @@ export const useClientStore = create<ClientStore>()(
       }
     },
 
-    createClient: async (payload: any) => {
+    createTrip: async (payload: Trip) => {
       try {
-        const res = await fetch('http://localhost:3000/client', {
+        const res = await fetch('http://localhost:3000/trip', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -103,11 +109,11 @@ export const useClientStore = create<ClientStore>()(
           body: JSON.stringify(payload),
         })
 
-        if (!res.ok) throw new Error('Error creating client')
-        await get().fetchClients(payload.teamId)
+        if (!res.ok) throw new Error('Error creating trip')
+        await get().fetchTrips(payload.teamId || '')
         return true
       } catch (error) {
-        console.error('Create client error:', error)
+        console.error('Create trip error:', error)
         return false
       }
     },

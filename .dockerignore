@@ -1,0 +1,57 @@
+# Carpetas de sistema
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+Icon?
+._*
+*.lnk
+
+# Archivos temporales
+*.log
+*.tmp
+*.swp
+*.bak
+*.~*
+
+# Configuración de IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Dependencias
+node_modules/
+package-lock.json
+
+# Build outputs
+build/
+dist/
+.out/
+.next/
+coverage/
+.cache/
+.husky/
+
+# Control de versiones
+.git/
+.gitignore
+.gitattributes
+
+# Archivos de Docker y Compose (solo si no necesitas copiarlos)
+Dockerfile
+docker-compose.yml
+
+# Archivos de sincronización OneDrive
+*.ini
+*.lnk
+*.tmp
+*.bak
+*.asd
+*.gdoc
+*.gsheet
+*.tmp.driveupload
+~$*
+
+# Archivos ocultos
+.*.swp
+.*.swo

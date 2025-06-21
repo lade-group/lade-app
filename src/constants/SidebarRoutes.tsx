@@ -8,13 +8,13 @@ import BadgeIcon from '@mui/icons-material/Badge'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import SignpostIcon from '@mui/icons-material/Signpost'
 import HandshakeIcon from '@mui/icons-material/Handshake'
-import HistoryIcon from '@mui/icons-material/History'
 import PlaceIcon from '@mui/icons-material/Place'
 import AddRoadIcon from '@mui/icons-material/AddRoad'
 import ReceiptIcon from '@mui/icons-material/Receipt'
-import PaymentsIcon from '@mui/icons-material/Payments'
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory'
-import VerifiedIcon from '@mui/icons-material/Verified'
+// import HistoryIcon from '@mui/icons-material/History'
+// import PaymentsIcon from '@mui/icons-material/Payments'
+// import VerifiedIcon from '@mui/icons-material/Verified'
 
 export const routes: RouteType[] = [
   {
@@ -92,25 +92,25 @@ export const routes: RouteType[] = [
     path: ROUTES.AJUSTES_DE_EQUIPO,
     element: <ManageAccountsIcon />,
   },
-  {
-    type: 'menu',
-    label: 'Suscripcion',
-    element: <PaymentsIcon />,
-    children: [
-      {
-        type: 'tab',
-        label: 'Tu suscripcion',
-        path: ROUTES.TU_SUSCRIPCION,
-        element: <VerifiedIcon />,
-      },
-      {
-        type: 'tab',
-        label: 'Historial de pagos',
-        path: ROUTES.HISTORIAL_DE_PAGOS,
-        element: <HistoryIcon />,
-      },
-    ],
-  },
+  // {
+  //   type: 'menu',
+  //   label: 'Suscripcion',
+  //   element: <PaymentsIcon />,
+  //   children: [
+  //     {
+  //       type: 'tab',
+  //       label: 'Tu suscripcion',
+  //       path: ROUTES.TU_SUSCRIPCION,
+  //       element: <VerifiedIcon />,
+  //     },
+  //     {
+  //       type: 'tab',
+  //       label: 'Historial de pagos',
+  //       path: ROUTES.HISTORIAL_DE_PAGOS,
+  //       element: <HistoryIcon />,
+  //     },
+  //   ],
+  // },
   {
     type: 'tab',
     label: 'Historial',

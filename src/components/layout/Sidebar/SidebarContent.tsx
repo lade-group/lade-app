@@ -16,7 +16,6 @@ const SidebarContent = ({
 }) => {
   const { logOut } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
   const [openMenus, setOpenMenus] = useState<string | null>(null)
 
   const toggleMenu = (menuLabel: string) => {

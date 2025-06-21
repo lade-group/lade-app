@@ -1,23 +1,26 @@
 import { createSwapy, Swapy } from 'swapy'
-import { useEffect, useRef, useState } from 'react'
+import { cloneElement, useEffect, useRef, useState } from 'react'
 import WidgetOptionsButtonMenu from './WidgetOptionsButtonMenu'
 import AnimatedButtonGroup from '../../../ui/ButtonGroup/AnimatedButtonGroup'
-import KPIWidget from '../../../ui/Widgets/KPIWidget'
-import BarCharWidget from '../../../ui/Widgets/BarCharWidget'
-import TableWidget from '../../../ui/Widgets/TableWidget'
-import { Add } from '@mui/icons-material'
+import KPIWidget from '../../../ui/Widgets/KPI/KPIWidget'
+import BarCharWidget from '../../../ui/Widgets/Charts/BarCharWidget'
+import LineChartWidget from '../../../ui/Widgets/Charts/LineChartWidget'
+import DoughnutChartWidget from '../../../ui/Widgets/Charts/DoughnutChartWidget'
+import TableWidget from '../../../ui/Widgets/DataViews/TableWidget'
 import AddWidgetModal from './AddWidgetModal'
+import AddWidgetPlaceholder from './AddWidgetPlaceholder'
 
 const WidgetScreenManager = () => {
   const swapyRef = useRef<Swapy | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+
   const [widgets, setWidgets] = useState<Record<string, React.ReactNode>>({
-    'a-1': <KPIWidget />,
-    'b-1': <BarCharWidget />,
-    d: <TableWidget />,
+    'a-1': <KPIWidget onRemove={() => {}} editable={false} />,
+    'b-1': <LineChartWidget onRemove={() => {}} editable={false} />,
+    d: <TableWidget onRemove={() => {}} editable={false} />,
   })
 
   useEffect(() => {
@@ -25,22 +28,16 @@ const WidgetScreenManager = () => {
       swapyRef.current = createSwapy(containerRef.current, {
         animation: 'spring',
       })
-      swapyRef.current.onBeforeSwap((event) => true)
+      swapyRef.current.enable(isEditing)
     }
-    return () => {
-      swapyRef.current?.destroy()
-    }
+    return () => swapyRef.current?.destroy()
   }, [])
 
   useEffect(() => {
-    if (swapyRef.current) {
-      swapyRef.current.enable(isEditing)
-    }
+    swapyRef.current?.enable(isEditing)
   }, [isEditing])
 
-  const handleToggleEditing = () => {
-    setIsEditing((prev) => !prev)
-  }
+  const handleToggleEditing = () => setIsEditing((prev) => !prev)
 
   const handleSlotClick = (slotId: string) => {
     setSelectedSlot(slotId)
@@ -48,34 +45,52 @@ const WidgetScreenManager = () => {
   }
 
   const handleAddWidget = (widgetId: string, slotId: string) => {
+    const handleRemove = () => {
+      setWidgets((prev) => {
+        const updated = { ...prev }
+        delete updated[slotId]
+        return updated
+      })
+    }
+
+    const props = { onRemove: handleRemove, editable: isEditing }
+
     const widgetMap: Record<string, React.ReactNode> = {
-      'kpi-1': <KPIWidget />,
-      'kpi-2': <KPIWidget />,
-      'kpi-3': <KPIWidget />,
-      'chart-1': <BarCharWidget />,
-      'chart-2': <BarCharWidget />,
-      'table-1': <TableWidget />,
-      'table-2': <TableWidget />,
+      'kpi-1': <KPIWidget {...props} />,
+      'kpi-2': <KPIWidget {...props} />,
+      'kpi-3': <KPIWidget {...props} />,
+      'chart-1': <BarCharWidget {...props} />,
+      'chart-2': <BarCharWidget {...props} />,
+      'chart-3': <LineChartWidget {...props} />,
+      'chart-4': <DoughnutChartWidget {...props} />,
+      'table-1': <TableWidget {...props} />,
+      'table-2': <TableWidget {...props} />,
     }
     setWidgets((prev) => ({ ...prev, [slotId]: widgetMap[widgetId] }))
   }
 
   const renderSlot = (slotId: string) => {
-    const children = widgets[slotId]
+    const widget = widgets[slotId]
+
+    const handleRemove = () => {
+      setWidgets((prev) => {
+        const updated = { ...prev }
+        delete updated[slotId]
+        return updated
+      })
+    }
+
+    const props = { onRemove: handleRemove, editable: isEditing }
+
     return (
-      <div
-        className={`h-full flex-1 rounded-lg relative ${
-          isEditing ? 'border-2 border-primary/40 border-dashed' : ''
-        }`}
-        data-swapy-slot={slotId}
-        onClick={() => isEditing && !children && handleSlotClick(slotId)}
-      >
-        {children}
-        {isEditing && !children && (
-          <div className='absolute inset-0 flex justify-center items-center'>
-            <Add className='w-6 h-6 text-primary cursor-pointer' />
-          </div>
-        )}
+      <div className='h-full w-full relative' data-swapy-slot={slotId}>
+        <div data-swapy-item={slotId} className='h-full w-full'>
+          {widget ? (
+            cloneElement(widget as any, props)
+          ) : (
+            <AddWidgetPlaceholder isEditing={isEditing} onClick={() => handleSlotClick(slotId)} />
+          )}
+        </div>
       </div>
     )
   }
@@ -86,23 +101,23 @@ const WidgetScreenManager = () => {
         <AnimatedButtonGroup isEditing={isEditing} onToggleEditing={handleToggleEditing} />
         <WidgetOptionsButtonMenu onToggleEditing={handleToggleEditing} />
       </div>
-      <div className='w-full flex flex-col gap-2 mx-auto' ref={containerRef}>
-        <div className='h-30 flex gap-2'>
+      <div className='w-full flex flex-col gap-6 mx-auto' ref={containerRef}>
+        <div className='h-1/4 w-full grid grid-cols-1 sm:grid-cols-4 gap-2'>
           {renderSlot('a-1')}
           {renderSlot('a-2')}
           {renderSlot('a-3')}
+          {renderSlot('a-4')}
         </div>
-        <div className='h-60 flex gap-2'>
+        <div className='h-1/4 w-full grid grid-cols-1 sm:grid-cols-2 gap-2'>
           {renderSlot('b-1')}
           {renderSlot('b-2')}
         </div>
-        <div className='h-60 flex gap-2'>
+        <div className='h-1/4 w-full grid grid-cols-1 sm:grid-cols-2 gap-2'>
           {renderSlot('c-1')}
           {renderSlot('c-2')}
         </div>
-        <div className='h-60 flex gap-2'>{renderSlot('d')}</div>
+        <div className='h-1/4 w-full grid grid-cols-1 gap-2'>{renderSlot('d')}</div>
       </div>
-
       <AddWidgetModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
