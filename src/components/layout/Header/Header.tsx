@@ -19,11 +19,11 @@ const Header = ({ isCollapsed }: { isCollapsed: boolean }) => {
       </div>
 
       <div className='flex items-center gap-4 px-10'>
-        <IconButton>
+        {/*<IconButton>
           <Badge badgeContent={3} color='error'>
             <NotificationsIcon className='text-primary' />
           </Badge>
-        </IconButton>
+        </IconButton>*/}
         <AvatarMenuButton />
       </div>
     </header>

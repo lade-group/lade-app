@@ -19,6 +19,7 @@ interface User {
   phone?: string
   preferredName?: string
   position?: string
+  role?: 'ADMIN' | 'USER' | 'OWNER'
 }
 
 interface AuthContextType {
@@ -42,6 +43,10 @@ interface LoginCredentials {
 
 interface SignupData {
   name: string
+  middle_name?: string
+  father_last_name: string
+  mother_last_name: string
+  phone: string
   email: string
   password: string
 }

@@ -2,8 +2,22 @@ import React, { useRef, useState, useCallback } from 'react'
 import { Button } from 'primereact/button'
 import { ProgressBar } from 'primereact/progressbar'
 import { Toast } from 'primereact/toast'
-import { s3Service, S3UploadConfig, S3UploadResponse } from '../../../core/services/s3Service'
 import { useNotification } from '../../../core/contexts/NotificationContext'
+
+export interface S3UploadConfig {
+  folder: string
+  allowedTypes: string[]
+  maxSizeMB: number
+  multiple?: boolean
+  showPreview?: boolean
+}
+
+export interface S3UploadResponse {
+  success: boolean
+  url?: string
+  key?: string
+  error?: string
+}
 
 export interface FileUploadProps {
   config: S3UploadConfig
@@ -51,9 +65,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
       for (const file of fileArray) {
         // Validar archivo
-        const validation = s3Service.validateFile(file, config)
-        if (!validation.valid) {
-          showNotification(validation.error!, 'error')
+        const maxSizeBytes = config.maxSizeMB * 1024 * 1024
+        if (file.size > maxSizeBytes) {
+          showNotification(`El archivo es demasiado grande. Máximo: ${config.maxSizeMB}MB`, 'error')
+          continue
+        }
+
+        const fileExtension = file.name.split('.').pop()?.toLowerCase()
+        if (!fileExtension || !config.allowedTypes.includes(fileExtension)) {
+          showNotification(
+            `Tipo de archivo no permitido. Permitidos: ${config.allowedTypes.join(', ')}`,
+            'error'
+          )
           continue
         }
 
@@ -61,7 +84,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         let preview: string | undefined
         if (config.showPreview && file.type.startsWith('image/')) {
           try {
-            preview = await s3Service.generateImagePreview(file)
+            preview = URL.createObjectURL(file)
           } catch (error) {
             console.error('Error generando preview:', error)
           }
@@ -77,35 +100,56 @@ const FileUpload: React.FC<FileUploadProps> = ({
         newUploads.push(uploadFile)
         setUploadedFiles((prev) => [...prev, uploadFile])
 
-        // Subir archivo
+        // Subir archivo al backend
         try {
-          const response = await s3Service.uploadFile(file, config.folder, entityId)
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('folder', config.folder)
+          if (entityId) {
+            formData.append('entityId', entityId)
+          }
 
-          if (response.success) {
+          const response = await fetch('http://localhost:3000/dms/upload', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+            },
+            body: formData,
+          })
+
+          if (response.ok) {
+            const result = await response.json()
+            const uploadResponse: S3UploadResponse = {
+              success: true,
+              url: result.url,
+              key: result.key,
+            }
+
             setUploadedFiles((prev) =>
               prev.map((upload) =>
                 upload.file === file
-                  ? { ...upload, status: 'success', progress: 100, response }
+                  ? { ...upload, status: 'success', progress: 100, response: uploadResponse }
                   : upload
               )
             )
 
-            onUploadSuccess(response)
+            onUploadSuccess(uploadResponse)
 
             // Si es una imagen y se requiere preview, actualizar
-            if (config.showPreview && file.type.startsWith('image/')) {
-              setCurrentPreview(response.url)
+            if (config.showPreview && file.type.startsWith('image/') && uploadResponse.url) {
+              setCurrentPreview(uploadResponse.url)
             }
 
             showNotification('Archivo subido exitosamente', 'success')
           } else {
+            const errorData = await response.json()
             setUploadedFiles((prev) =>
               prev.map((upload) =>
                 upload.file === file ? { ...upload, status: 'error', progress: 0 } : upload
               )
             )
 
-            const errorMsg = response.error || 'Error al subir archivo'
+            const errorMsg = errorData.message || 'Error al subir archivo'
             showNotification(errorMsg, 'error')
             onUploadError?.(errorMsg)
           }
@@ -152,17 +196,22 @@ const FileUpload: React.FC<FileUploadProps> = ({
     setIsDragging(false)
   }, [])
 
-  const handleRemoveFile = (file: UploadedFile) => {
-    setUploadedFiles((prev) => prev.filter((upload) => upload.file !== file))
+  const handleRemoveFile = (uploadedFile: UploadedFile) => {
+    setUploadedFiles((prev) => prev.filter((upload) => upload.file !== uploadedFile.file))
 
     // Si era el archivo actual, limpiar preview
-    if (file.response?.url === currentPreview) {
+    if (uploadedFile.response?.url === currentPreview) {
       setCurrentPreview(null)
     }
 
     // Eliminar de S3 si se subió exitosamente
-    if (file.response?.key) {
-      s3Service.deleteFile(file.response.key).catch((error) => {
+    if (uploadedFile.response?.key) {
+      fetch(`http://localhost:3000/dms/${uploadedFile.response.key}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      }).catch((error: any) => {
         console.error('Error eliminando archivo de S3:', error)
       })
     }

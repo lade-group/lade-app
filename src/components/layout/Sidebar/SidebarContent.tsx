@@ -4,7 +4,7 @@ import { Divider, Badge } from '@mui/material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import { routes } from '../../../constants/SidebarRoutes'
+import { routes, filterRoutesByRole } from '../../../constants/SidebarRoutes'
 import { useAuth } from '../../../core/contexts/AuthContext'
 
 const SidebarContent = ({
@@ -14,9 +14,15 @@ const SidebarContent = ({
   isCollapsed: boolean
   setIsCollapsed: any
 }) => {
-  const { logOut } = useAuth()
+  const { logOut, currentUser } = useAuth()
   const location = useLocation()
   const [openMenus, setOpenMenus] = useState<string | null>(null)
+
+  // Obtener el rol del usuario (por defecto USER si no está definido)
+  const userRole = currentUser?.role || 'USER'
+
+  // Filtrar rutas según el rol del usuario
+  const filteredRoutes = filterRoutesByRole(routes, userRole)
 
   const toggleMenu = (menuLabel: string) => {
     setOpenMenus((prev) => (prev === menuLabel ? null : menuLabel))
@@ -108,7 +114,7 @@ const SidebarContent = ({
       className='flex flex-col h-full justify-between
 '
     >
-      <div>{routes.map((route, index) => renderRoute(route, index))}</div>
+      <div>{filteredRoutes.map((route, index) => renderRoute(route, index))}</div>
       <div>
         <Divider variant='middle' />
         <span

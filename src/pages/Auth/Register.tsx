@@ -8,13 +8,13 @@ import { GoogleLoginButton } from '../../components/ui/Buttons/GoogleLoginButton
 const RegisterPage = () => {
   const { signUp } = useAuth()
   const [form, setForm] = useState({
-    name: 'Diego',
-    middle_name: 'Antonio',
-    father_last_name: 'Lopez',
-    mother_last_name: 'Diego',
-    phone: '8441039924',
-    email: 'diego456.dlm77@gmail.com',
-    password: '123123',
+    name: '',
+    middle_name: '',
+    father_last_name: '',
+    mother_last_name: '',
+    phone: '',
+    email: '',
+    password: '',
   })
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {

@@ -4,7 +4,8 @@ Un componente reutilizable para subida de archivos a S3 con diferentes configura
 
 ## Características
 
-- ✅ **Subida directa a S3** usando URLs pre-firmadas
+- ✅ **Subida al backend** que maneja S3 internamente
+- ✅ **URLs públicas directas** sin parámetros firmados
 - ✅ **Vista previa de imágenes** para perfiles y logos
 - ✅ **Lista de archivos** para documentos múltiples
 - ✅ **Drag & Drop** para mejor UX
@@ -51,8 +52,15 @@ Un componente reutilizable para subida de archivos a S3 con diferentes configura
 
 ```tsx
 import FileUpload from '../../../components/ui/FileUpload/FileUpload'
-import { teamLogoConfig } from '../../../core/config/fileUploadConfigs'
-import { S3UploadResponse } from '../../../core/services/s3Service'
+import { S3UploadResponse } from '../../../components/ui/FileUpload/FileUpload'
+
+const teamLogoConfig = {
+  folder: 'teams',
+  allowedTypes: ['jpg', 'jpeg', 'png', 'gif', 'svg'],
+  maxSizeMB: 5,
+  showPreview: true,
+  multiple: false,
+}
 
 const MyComponent = () => {
   const handleUploadSuccess = (response: S3UploadResponse) => {
