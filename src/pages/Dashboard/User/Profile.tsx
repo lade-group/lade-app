@@ -14,6 +14,8 @@ import Accordion from '../../../components/ui/Acoordion/Accordion'
 import FileUpload from '../../../components/ui/FileUpload/FileUpload'
 import placeholderImage from '../../../assets/images/placeholder.jpg'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface UserProfile {
   id: string
   name: string
@@ -61,7 +63,7 @@ const Profile = () => {
   const loadUserProfile = async () => {
     try {
       setLoading(true)
-      const res = await fetch('http://localhost:3000/users/profile', {
+      const res = await fetch(`${API_URL}/users/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -92,7 +94,7 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     try {
       setLoading(true)
-      const res = await fetch('http://localhost:3000/users/profile', {
+      const res = await fetch(`${API_URL}/users/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +137,7 @@ const Profile = () => {
 
     try {
       setLoading(true)
-      const res = await fetch('http://localhost:3000/users/change-password', {
+      const res = await fetch(`${API_URL}/users/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +179,7 @@ const Profile = () => {
       accept: async () => {
         try {
           setLoading(true)
-          const res = await fetch('http://localhost:3000/users/leave-team', {
+          const res = await fetch(`${API_URL}/users/leave-team`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -208,7 +210,7 @@ const Profile = () => {
       accept: async () => {
         try {
           setLoading(true)
-          const res = await fetch('http://localhost:3000/users/delete-account', {
+          const res = await fetch(`${API_URL}/users/delete-account`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -317,7 +319,7 @@ const Profile = () => {
                     if (response.success && response.url) {
                       try {
                         // Actualizar el photoUrl en la base de datos
-                        const updateRes = await fetch('http://localhost:3000/users/profile', {
+                        const updateRes = await fetch(`${API_URL}/users/profile`, {
                           method: 'PATCH',
                           headers: {
                             'Content-Type': 'application/json',

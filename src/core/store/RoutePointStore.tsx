@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface RoutePointAddress {
   street: string
   exterior_number: string
@@ -79,7 +81,7 @@ export const useRoutePointStore = create<RoutePointStore>()(
         if (search.trim()) params.append('name', search.trim())
         if (statusFilter && statusFilter.trim() !== '') params.append('status', statusFilter)
 
-        const res = await fetch(`http://localhost:3000/routepoint?${params.toString()}`, {
+        const res = await fetch(`${API_URL}/routepoint?${params.toString()}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -99,7 +101,7 @@ export const useRoutePointStore = create<RoutePointStore>()(
 
     createRoutePoint: async (payload: any) => {
       try {
-        const res = await fetch('http://localhost:3000/routepoint', {
+        const res = await fetch(`${API_URL}/routepoint`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -123,7 +125,7 @@ export const useRoutePointStore = create<RoutePointStore>()(
       teamId: string
     ) => {
       try {
-        const res = await fetch(`http://localhost:3000/routepoint/${id}/status`, {
+        const res = await fetch(`${API_URL}/routepoint/${id}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -145,7 +147,7 @@ export const useRoutePointStore = create<RoutePointStore>()(
 
     deleteRoutePoint: async (id: string, teamId: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/routepoint/${id}`, {
+        const res = await fetch(`${API_URL}/routepoint/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,

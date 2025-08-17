@@ -19,6 +19,8 @@ import FileUpload from '../../../components/ui/FileUpload/FileUpload'
 import { driverFilesConfig } from '../../../core/config/fileUploadConfigs'
 import { S3UploadResponse } from '../../../core/services/s3Service'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface Contact {
   type: 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
   value: string
@@ -73,7 +75,7 @@ const DriverPage = () => {
   useEffect(() => {
     const fetchDriver = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/driver/${id}`, {
+        const res = await fetch(`${API_URL}/driver/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
           },
@@ -106,7 +108,7 @@ const DriverPage = () => {
     setEditMode(false)
     // Recargar datos originales
     if (id) {
-      fetch(`http://localhost:3000/driver/${id}`, {
+      fetch(`${API_URL}/driver/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },

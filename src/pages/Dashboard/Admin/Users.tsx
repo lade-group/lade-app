@@ -9,6 +9,8 @@ import { Dialog } from 'primereact/dialog'
 import { InputText } from 'primereact/inputtext'
 import { Drawer } from '@mui/material'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface TeamUser {
   id: string
   email: string
@@ -111,7 +113,7 @@ const TeamUsersPage = () => {
       if (!currentTeam?.id) return
 
       try {
-        const resUsers = await fetch(`http://localhost:3000/teams/${currentTeam.id}/users`, {
+        const resUsers = await fetch(`${API_URL}/teams/${currentTeam.id}/users`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
         const jsonUsers = await resUsers.json()
@@ -127,12 +129,9 @@ const TeamUsersPage = () => {
           })
         )
 
-        const resInvites = await fetch(
-          `http://localhost:3000/access-teams/${currentTeam.id}/invitations`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
-          }
-        )
+        const resInvites = await fetch(`${API_URL}/access-teams/${currentTeam.id}/invitations`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+        })
         const jsonInvites = await resInvites.json()
         setInvitations(jsonInvites)
       } catch (err) {
@@ -146,7 +145,7 @@ const TeamUsersPage = () => {
   const handleInvite = async () => {
     if (!currentTeam || !newEmail) return
     try {
-      await fetch(`http://localhost:3000/access-teams/${currentTeam.id}/invite`, {
+      await fetch(`${API_URL}/access-teams/${currentTeam.id}/invite`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -164,7 +163,7 @@ const TeamUsersPage = () => {
   const handleRoleChange = async (newRole: TeamUser['role']) => {
     if (!selectedUser || !currentTeam) return
     try {
-      await fetch(`http://localhost:3000/teams/${currentTeam.id}/users/${selectedUser.id}/role`, {
+      await fetch(`${API_URL}/teams/${currentTeam.id}/users/${selectedUser.id}/role`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,

@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export type DriverStatus = 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO'
 export type ContactType = 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
 
@@ -104,7 +106,7 @@ export const useDriverStore = create<DriverState>((set, get) => ({
     if (filters.search) params.append('search', filters.search)
 
     try {
-      const res = await fetch(`http://localhost:3000/driver?${params.toString()}`, {
+      const res = await fetch(`${API_URL}/driver?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -140,7 +142,7 @@ export const useDriverStore = create<DriverState>((set, get) => ({
         formData.append('photo', photoFile)
       }
 
-      const res = await fetch('http://localhost:3000/driver', {
+      const res = await fetch(`${API_URL}/driver`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -161,7 +163,7 @@ export const useDriverStore = create<DriverState>((set, get) => ({
 
   updateDriver: async (id: string, payload: Partial<Driver>) => {
     try {
-      const res = await fetch(`http://localhost:3000/driver/${id}`, {
+      const res = await fetch(`${API_URL}/driver/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +190,7 @@ export const useDriverStore = create<DriverState>((set, get) => ({
 
   deleteDriver: async (id: string, teamId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/driver/${id}`, {
+      const res = await fetch(`${API_URL}/driver/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -208,7 +210,7 @@ export const useDriverStore = create<DriverState>((set, get) => ({
 
   updateDriverStatus: async (id: string, status: DriverStatus) => {
     try {
-      const res = await fetch(`http://localhost:3000/driver/${id}/status`, {
+      const res = await fetch(`${API_URL}/driver/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

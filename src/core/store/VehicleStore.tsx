@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { useTeamStore } from './TeamStore'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export type VehicleStatus = 'DISPONIBLE' | 'EN_USO' | 'MANTENIMIENTO' | 'CANCELADO' | 'DESUSO'
 
 export interface VehicleDocument {
@@ -107,7 +109,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
     if (filters.search) params.append('search', filters.search)
 
     try {
-      const res = await fetch(`http://localhost:3000/vehicle?${params.toString()}`, {
+      const res = await fetch(`${API_URL}/vehicle?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -146,7 +148,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
         formData.append('photo', photoFile)
       }
 
-      const res = await fetch('http://localhost:3000/vehicle', {
+      const res = await fetch(`${API_URL}/vehicle`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -166,7 +168,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
 
   updateVehicle: async (id, payload) => {
     try {
-      const res = await fetch(`http://localhost:3000/vehicle/${id}`, {
+      const res = await fetch(`${API_URL}/vehicle/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +194,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
 
   deleteVehicle: async (id, teamId) => {
     try {
-      const res = await fetch(`http://localhost:3000/vehicle/${id}`, {
+      const res = await fetch(`${API_URL}/vehicle/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -213,7 +215,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
 
   updateVehicleStatus: async (id, status, teamId) => {
     try {
-      const res = await fetch(`http://localhost:3000/vehicle/${id}/status`, {
+      const res = await fetch(`${API_URL}/vehicle/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

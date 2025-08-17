@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface Invoice {
   id: string
   tripId: string
@@ -101,7 +103,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
         ...(filters.status && { status: filters.status }),
       })
 
-      const res = await fetch(`http://localhost:3000/invoice?${params}`, {
+      const res = await fetch(`${API_URL}/invoice?${params}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -125,7 +127,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set({ loading: true })
 
     try {
-      const res = await fetch(`http://localhost:3000/invoice/${id}`, {
+      const res = await fetch(`${API_URL}/invoice/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -145,7 +147,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
 
   createInvoiceFromTrip: async (tripId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/invoice/create-from-trip/${tripId}`, {
+      const res = await fetch(`${API_URL}/invoice/create-from-trip/${tripId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -163,7 +165,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
 
   stampInvoice: async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/invoice/${id}/stamp`, {
+      const res = await fetch(`${API_URL}/invoice/${id}/stamp`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -190,7 +192,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
 
   cancelInvoice: async (id: string, reason: string = '01') => {
     try {
-      const res = await fetch(`http://localhost:3000/invoice/${id}/cancel`, {
+      const res = await fetch(`${API_URL}/invoice/${id}/cancel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

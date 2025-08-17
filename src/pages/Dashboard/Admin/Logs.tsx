@@ -6,6 +6,8 @@ import { Tag } from 'primereact/tag'
 import { Toast } from 'primereact/toast'
 import { useNotification } from '../../../core/contexts/NotificationContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface Log {
   id: string
   action:
@@ -73,7 +75,7 @@ const LogsPage = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true)
-      const res = await fetch(`http://localhost:3000/logs/team?page=${currentPage}&limit=20`, {
+      const res = await fetch(`${API_URL}/logs/team?page=${currentPage}&limit=20`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },

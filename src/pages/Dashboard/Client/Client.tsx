@@ -19,6 +19,8 @@ import FileUpload from '../../../components/ui/FileUpload/FileUpload'
 import { clientFilesConfig } from '../../../core/config/fileUploadConfigs'
 import { S3UploadResponse } from '../../../core/services/s3Service'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface Contact {
   id: string
   type: 'EMAIL' | 'PHONE' | 'FAX' | 'OTHER'
@@ -92,7 +94,7 @@ const ClientPage = () => {
   useEffect(() => {
     const fetchClient = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/client/${id}`, {
+        const res = await fetch(`${API_URL}/client/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
           },

@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface CreateTeamData {
   name: string
   logo?: string
@@ -82,7 +84,7 @@ export const useTeamStore = create<TeamStore>()(
           console.log('No logo file provided')
         }
 
-        const res = await fetch('http://localhost:3000/teams', {
+        const res = await fetch(`${API_URL}/teams`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -105,7 +107,7 @@ export const useTeamStore = create<TeamStore>()(
     fetchTeams: async () => {
       set({ loading: true })
       try {
-        const res = await fetch('http://localhost:3000/teams', {
+        const res = await fetch(`${API_URL}/teams`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -124,7 +126,7 @@ export const useTeamStore = create<TeamStore>()(
 
     getTeamById: async (id: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/teams/${id}`, {
+        const res = await fetch(`${API_URL}/teams/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -147,7 +149,7 @@ export const useTeamStore = create<TeamStore>()(
           formData.append('logo', logoFile)
         }
 
-        const res = await fetch(`http://localhost:3000/teams/${id}`, {
+        const res = await fetch(`${API_URL}/teams/${id}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
           body: formData,
@@ -168,7 +170,7 @@ export const useTeamStore = create<TeamStore>()(
     updateTeamAddress: async (id: string, address: any) => {
       set({ loading: true })
       try {
-        const res = await fetch(`http://localhost:3000/teams/${id}/address`, {
+        const res = await fetch(`${API_URL}/teams/${id}/address`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -192,7 +194,7 @@ export const useTeamStore = create<TeamStore>()(
     deactivateTeam: async (id: string) => {
       set({ loading: true })
       try {
-        const res = await fetch(`http://localhost:3000/teams/${id}/deactivate`, {
+        const res = await fetch(`${API_URL}/teams/${id}/deactivate`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
@@ -212,7 +214,7 @@ export const useTeamStore = create<TeamStore>()(
     reactivateTeam: async (id: string) => {
       set({ loading: true })
       try {
-        const res = await fetch(`http://localhost:3000/teams/${id}/reactivate`, {
+        const res = await fetch(`${API_URL}/teams/${id}/reactivate`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
@@ -232,7 +234,7 @@ export const useTeamStore = create<TeamStore>()(
     suspendTeam: async (id: string) => {
       set({ loading: true })
       try {
-        const res = await fetch(`http://localhost:3000/teams/${id}/suspend`, {
+        const res = await fetch(`${API_URL}/teams/${id}/suspend`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })

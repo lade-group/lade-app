@@ -3,6 +3,8 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { useAuth } from './AuthContext'
 import { useNotification } from './NotificationContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface Vehicle {
   id: string
   plate: string
@@ -49,7 +51,7 @@ const VehicleProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchFilters = async () => {
     try {
-      const res = await fetch('http://localhost:3000/vehicle/filters')
+      const res = await fetch(`${API_URL}/vehicle/filters`)
       const data = await res.json()
       setStatusOptions(data.statusOptions)
       setTypeOptions(data.typeOptions)
@@ -72,7 +74,7 @@ const VehicleProvider = ({ children }: { children: React.ReactNode }) => {
       if (filters.type) params.append('type', filters.type)
 
       try {
-        const res = await fetch(`http://localhost:3000/vehicle?${params}`)
+        const res = await fetch(`${API_URL}/vehicle?${params}`)
         const json = await res.json()
 
         setVehicles((prev) => (nextPage === 0 ? json.data : [...prev, ...json.data]))
@@ -107,7 +109,7 @@ const VehicleProvider = ({ children }: { children: React.ReactNode }) => {
     if (!currentTeam?.id) return
 
     try {
-      const res = await fetch('http://localhost:3000/vehicle', {
+      const res = await fetch(`${API_URL}/vehicle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

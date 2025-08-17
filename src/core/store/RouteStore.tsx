@@ -3,6 +3,8 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { useTeamStore } from './TeamStore'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface RouteStop {
   id: string
   order: number
@@ -93,7 +95,7 @@ export const useRouteStore = create<RouteStore>()(
         if (search.trim()) params.append('search', search.trim())
         if (statusFilter && statusFilter.trim() !== '') params.append('status', statusFilter)
 
-        const res = await fetch(`http://localhost:3000/route?${params.toString()}`, {
+        const res = await fetch(`${API_URL}/route?${params.toString()}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -118,8 +120,8 @@ export const useRouteStore = create<RouteStore>()(
       console.log('token starts with:', token.substring(0, 20))
 
       try {
-        console.log('Making request to:', 'http://localhost:3000/route')
-        const res = await fetch('http://localhost:3000/route', {
+        console.log('Making request to:', `${API_URL}/route`)
+        const res = await fetch(`${API_URL}/route`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -154,7 +156,7 @@ export const useRouteStore = create<RouteStore>()(
       teamId: string
     ) => {
       try {
-        const res = await fetch(`http://localhost:3000/route/${id}/status`, {
+        const res = await fetch(`${API_URL}/route/${id}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -175,7 +177,7 @@ export const useRouteStore = create<RouteStore>()(
 
     deleteRoute: async (id: string, teamId: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/route/${id}`, {
+        const res = await fetch(`${API_URL}/route/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,

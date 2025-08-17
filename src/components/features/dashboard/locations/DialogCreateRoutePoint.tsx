@@ -9,6 +9,8 @@ import { useClientStore } from '../../../../core/store/ClientStore'
 import { useTeamStore } from '../../../../core/store/TeamStore'
 import { useNotification } from '../../../../core/contexts/NotificationContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 const DialogCreateRoutePoint = () => {
   const { currentTeam } = useTeamStore()
   const { showNotification } = useNotification()
@@ -82,7 +84,7 @@ const DialogCreateRoutePoint = () => {
 
     try {
       // Primero crear la dirección
-      const addressRes = await fetch('http://localhost:3000/address', {
+      const addressRes = await fetch(`${API_URL}/address`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ export interface S3UploadResponse {
 }
 
 class S3Service {
-  private baseUrl = 'http://localhost:3000/dms'
+  private baseUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/dms`
 
   /**
    * Genera una URL de subida para un archivo

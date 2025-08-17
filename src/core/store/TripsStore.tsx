@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface Cargo {
   id?: string
   name: string
@@ -123,7 +125,7 @@ export const useTripsStore = create<TripStore>()(
         if (filters.clientName?.trim()) params.append('search', filters.clientName.trim())
         if (filters.status) params.append('status', filters.status)
 
-        const res = await fetch(`http://localhost:3000/trip?${params.toString()}`, {
+        const res = await fetch(`${API_URL}/trip?${params.toString()}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -152,7 +154,7 @@ export const useTripsStore = create<TripStore>()(
         console.log('Creating trip with payload:', payload)
         console.log('Token:', token.substring(0, 20) + '...')
 
-        const res = await fetch('http://localhost:3000/trip', {
+        const res = await fetch(`${API_URL}/trip`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -182,7 +184,7 @@ export const useTripsStore = create<TripStore>()(
 
     updateTripStatus: async (id: string, status: string, teamId: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/trip/${id}/status`, {
+        const res = await fetch(`${API_URL}/trip/${id}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -202,7 +204,7 @@ export const useTripsStore = create<TripStore>()(
 
     getTrip: async (id: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/trip/${id}`, {
+        const res = await fetch(`${API_URL}/trip/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 

@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface ClientAddress {
   street: string
   exterior_number: string
@@ -87,7 +89,7 @@ export const useClientStore = create<ClientStore>()(
         if (search.trim()) params.append('search', search.trim())
         if (statusFilter) params.append('status', statusFilter)
 
-        const res = await fetch(`http://localhost:3000/client?${params.toString()}`, {
+        const res = await fetch(`${API_URL}/client?${params.toString()}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         })
 
@@ -107,7 +109,7 @@ export const useClientStore = create<ClientStore>()(
 
     createClient: async (payload: any) => {
       try {
-        const res = await fetch('http://localhost:3000/client', {
+        const res = await fetch(`${API_URL}/client`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +129,7 @@ export const useClientStore = create<ClientStore>()(
 
     updateClient: async (id: string, payload: Partial<Client>) => {
       try {
-        const res = await fetch(`http://localhost:3000/client/${id}`, {
+        const res = await fetch(`${API_URL}/client/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -154,7 +156,7 @@ export const useClientStore = create<ClientStore>()(
 
     deleteClient: async (id: string, teamId: string) => {
       try {
-        const res = await fetch(`http://localhost:3000/client/${id}`, {
+        const res = await fetch(`${API_URL}/client/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -178,7 +180,7 @@ export const useClientStore = create<ClientStore>()(
       teamId: string
     ) => {
       try {
-        const res = await fetch(`http://localhost:3000/client/${id}/status`, {
+        const res = await fetch(`${API_URL}/client/${id}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

@@ -4,6 +4,8 @@ import { ProgressBar } from 'primereact/progressbar'
 import { Toast } from 'primereact/toast'
 import { useNotification } from '../../../core/contexts/NotificationContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 export interface S3UploadConfig {
   folder: string
   allowedTypes: string[]
@@ -109,7 +111,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             formData.append('entityId', entityId)
           }
 
-          const response = await fetch('http://localhost:3000/dms/upload', {
+          const response = await fetch(`${API_URL}/dms/upload`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -206,7 +208,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     // Eliminar de S3 si se subió exitosamente
     if (uploadedFile.response?.key) {
-      fetch(`http://localhost:3000/dms/${uploadedFile.response.key}`, {
+      fetch(`${API_URL}/dms/${uploadedFile.response.key}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
