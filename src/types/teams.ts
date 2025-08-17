@@ -2,6 +2,7 @@
 export interface TeamFormData {
   name: string
   logo: string
+  logoFile?: File | null
   address: {
     street: string
     exterior_number: string

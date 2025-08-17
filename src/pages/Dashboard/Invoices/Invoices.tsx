@@ -1,13 +1,18 @@
+import InvoiceList from '../../../components/features/dashboard/invoices/InvoiceList'
+
 const InvoicePage = () => {
   return (
-    <div>
-      <div className='flex justify-between'>
-        <h1 className='text-4xl text-primary font-bold'>Facturas</h1>
+    <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
+        <div>
+          <h1 className='text-4xl text-primary font-bold'>Facturas</h1>
+          <p className='text-lg text-gray-600 mt-2'>
+            Gestiona y descarga todas las facturas de tus viajes
+          </p>
+        </div>
       </div>
-      <div>
-        <span className='text-lg'>Maneja a los pilotos de tus unidades</span>
-      </div>
-      <div className='w-full'></div>
+
+      <InvoiceList />
     </div>
   )
 }

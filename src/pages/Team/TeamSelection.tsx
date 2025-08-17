@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../../core/contexts/AuthContext'
 import { useTeamStore } from '../../core/store/TeamStore'
+import TeamLogo from '../../components/ui/TeamLogo/TeamLogo'
 
 import { Team } from '../../types/teams'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
@@ -17,16 +18,29 @@ const TeamSelection = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
+        console.log('Fetching teams from:', `${API_URL}/teams/mine`)
+        console.log('Token:', localStorage.getItem('token'))
+
         const res = await fetch(`${API_URL}/teams/mine`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         })
-        if (!res.ok) throw new Error('No se pudo cargar equipos')
+
+        console.log('Response status:', res.status)
+        console.log('Response ok:', res.ok)
+
+        if (!res.ok) {
+          const errorText = await res.text()
+          console.error('Error response:', errorText)
+          throw new Error(`No se pudo cargar equipos: ${res.status} ${errorText}`)
+        }
+
         const data = await res.json()
+        console.log('Teams data:', data)
         setTeams(data.map((t: any) => ({ id: t.team.id, name: t.team.name, logo: t.team.logo })))
       } catch (err) {
-        console.error(err)
+        console.error('Error fetching teams:', err)
       } finally {
         setLoading(false)
       }
@@ -103,14 +117,10 @@ const TeamSelection = () => {
                 <div
                   onClick={() => handleEnterTeam(team)}
                   key={team.id}
-                  className='flex items-center justify-between border rounded-md p-3 hover:bg-gray-100 transition'
+                  className='hover:cursor-pointer flex items-center justify-between border rounded-md p-3 hover:bg-gray-100 transition'
                 >
                   <div className='flex items-center gap-3'>
-                    <img
-                      src={team.logo || '/assets/logo-placeholder.svg'}
-                      alt={team.name}
-                      className='w-8 h-8 rounded-full object-cover'
-                    />
+                    <TeamLogo team={team} size='sm' />
                     <span className='font-medium'>{team.name}</span>
                   </div>
                 </div>

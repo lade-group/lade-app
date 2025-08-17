@@ -4,17 +4,18 @@ import { useNavigate } from 'react-router'
 import { DataTable, DataTableSelectEvent } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator'
-import { TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material'
 import { useNotification } from '../../../../../core/contexts/NotificationContext'
 import { useTeamStore } from '../../../../../core/store/TeamStore'
 import { useTripsStore } from '../../../../../core/store/TripsStore'
+import TripFilterBar from './TripFilterBar'
+import TripStatusTag from '../../../../ui/Tag/TripStatusTag'
 
 const TripList = () => {
   const navigate = useNavigate()
   const { showNotification } = useNotification()
   const { currentTeam } = useTeamStore()
 
-  const { trips, filters, fetchTrips, setFilters, setPagination, loading, first, rows } =
+  const { trips, totalRecords, fetchTrips, setPagination, loading, first, rows, filters } =
     useTripsStore()
 
   useEffect(() => {
@@ -23,49 +24,42 @@ const TripList = () => {
       return
     }
     fetchTrips(currentTeam.id)
-  }, [first, rows, filters])
+  }, [first, rows, currentTeam?.id, filters])
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {
     setPagination(event.first, event.rows)
   }
 
   const rowSelected = (e: DataTableSelectEvent) => {
-    navigate(`/trips/${e.data.id}`)
+    navigate(`/dashboard/trips/${e.data.id}`)
   }
 
   const statusBodyTemplate = (trip: any) => {
-    return <span className='font-semibold'>{trip.status}</span>
+    return <TripStatusTag status={trip.status} />
+  }
+
+  const dateBodyTemplate = (date: string) => {
+    return new Date(date).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  const routeBodyTemplate = (trip: any) => {
+    if (!trip.route?.stops || trip.route.stops.length === 0) return 'Sin ruta'
+
+    const firstStop = trip.route.stops[0]
+    const lastStop = trip.route.stops[trip.route.stops.length - 1]
+
+    return `${firstStop.point.address.city} → ${lastStop.point.address.city}`
   }
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='flex flex-wrap gap-6 items-end'>
-        <TextField
-          label='Buscar por cliente'
-          variant='outlined'
-          value={filters.clientName || ''}
-          onChange={(e) => setFilters({ ...filters, clientName: e.target.value })}
-          size='small'
-          className='w-80'
-        />
-
-        <FormControl size='small' className='w-60'>
-          <InputLabel id='status-filter-label'>Estatus</InputLabel>
-          <Select
-            labelId='status-filter-label'
-            value={filters.status || ''}
-            label='Estatus'
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          >
-            <MenuItem value=''>Todos</MenuItem>
-            <MenuItem value='PREINICIALIZADO'>Preinicializado</MenuItem>
-            <MenuItem value='EN_PROCESO'>En proceso</MenuItem>
-            <MenuItem value='FINALIZADO_A_TIEMPO'>Finalizado a tiempo</MenuItem>
-            <MenuItem value='FINALIZADO_TARDIO'>Finalizado tardío</MenuItem>
-            <MenuItem value='CANCELADO'>Cancelado</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
+      <TripFilterBar />
 
       <DataTable
         value={trips}
@@ -77,24 +71,24 @@ const TripList = () => {
         scrollable
         scrollHeight='flex'
         loading={loading}
+        className='cursor-pointer'
       >
-        <Column field='id' header='ID' sortable />
+        <Column field='id' header='ID' sortable style={{ width: '80px' }} />
         <Column field='client.name' header='Cliente' sortable />
         <Column field='driver.name' header='Conductor' sortable />
         <Column field='vehicle.plate' header='Vehículo' sortable />
-        <Column field='route.originCity' header='Origen' sortable />
-        <Column field='route.destinationCity' header='Destino' sortable />
-        <Column field='startDate' header='Inicio' sortable />
-        <Column field='endDate' header='Fin' sortable />
+        <Column field='route' header='Ruta' body={routeBodyTemplate} sortable />
+        <Column field='startDate' header='Inicio' body={dateBodyTemplate} sortable />
+        <Column field='endDate' header='Fin' body={dateBodyTemplate} sortable />
         <Column field='status' header='Estatus' body={statusBodyTemplate} sortable />
       </DataTable>
 
-      {trips.length >= rows && (
+      {totalRecords > rows && (
         <div className='pt-4'>
           <Paginator
             first={first}
             rows={rows}
-            totalRecords={trips.length + rows}
+            totalRecords={totalRecords}
             onPageChange={onPageChange}
           />
         </div>

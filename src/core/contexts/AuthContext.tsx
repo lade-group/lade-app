@@ -13,6 +13,12 @@ interface User {
   email: string
   name: string
   father_last_name: string
+  photoUrl?: string
+  middle_name?: string
+  mother_last_name?: string
+  phone?: string
+  preferredName?: string
+  position?: string
 }
 
 interface AuthContextType {
@@ -26,6 +32,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   loadProfile: () => Promise<void>
   loadTeams: () => Promise<Team[]>
+  updateProfile: (userData: Partial<User>) => void
 }
 
 interface LoginCredentials {
@@ -208,6 +215,12 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   }
 
+  const updateProfile = (userData: Partial<User>): void => {
+    if (currentUser) {
+      setCurrentUser({ ...currentUser, ...userData })
+    }
+  }
+
   const values: AuthContextType = {
     currentUser,
     currentTeam,
@@ -219,6 +232,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     loading,
     loadProfile,
     loadTeams,
+    updateProfile,
   }
 
   if (loading) return <div>Cargando...</div>

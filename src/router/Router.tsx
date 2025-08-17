@@ -32,6 +32,7 @@ const Drivers = React.lazy(() => import('../pages/Dashboard/Drivers/Drivers'))
 const Driver = React.lazy(() => import('../pages/Dashboard/Drivers/Driver'))
 
 const Invoices = React.lazy(() => import('../pages/Dashboard/Invoices/Invoices'))
+const Invoice = React.lazy(() => import('../pages/Dashboard/Invoices/Invoice'))
 
 const Units = React.lazy(() => import('../pages/Dashboard/Units/Units'))
 const Unit = React.lazy(() => import('../pages/Dashboard/Units/Unit'))
@@ -77,6 +78,7 @@ function Router() {
 
             <Route path={ROUTES.FACTURAS}>
               <Route index element={<Invoices />} />
+              <Route path=':id' element={<Invoice />} />
             </Route>
 
             <Route path={ROUTES.CLIENTES}>

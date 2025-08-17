@@ -14,6 +14,7 @@ const CreateTeamWizardPage = () => {
   const [teamData, setTeamData] = useState<any>({
     name: '',
     logo: '',
+    logoFile: null as File | null,
     address: {
       street: '',
       exterior_number: '',

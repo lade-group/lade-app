@@ -26,6 +26,12 @@ export interface Client {
   taxRegime?: string
   zipCode?: string
   creditLimit?: number
+  paymentTerms?: string
+  preferredPaymentMethod?: string
+  businessType?: string
+  industry?: string
+  specialRequirements?: string
+  notes?: string
   address: ClientAddress
   contacts?: Array<{ id?: string; type: string; value: string }>
   teamId?: string
@@ -45,6 +51,13 @@ interface ClientStore {
   setPagination: (first: number, rows: number) => void
   fetchClients: (teamId: string) => Promise<void>
   createClient: (payload: Client) => Promise<boolean>
+  updateClient: (id: string, payload: Partial<Client>) => Promise<boolean>
+  deleteClient: (id: string, teamId: string) => Promise<boolean>
+  updateClientStatus: (
+    id: string,
+    status: 'ACTIVE' | 'CANCELLED' | 'DELETED',
+    teamId: string
+  ) => Promise<boolean>
 }
 
 export const useClientStore = create<ClientStore>()(
@@ -108,6 +121,79 @@ export const useClientStore = create<ClientStore>()(
         return true
       } catch (error) {
         console.error('Create client error:', error)
+        return false
+      }
+    },
+
+    updateClient: async (id: string, payload: Partial<Client>) => {
+      try {
+        const res = await fetch(`http://localhost:3000/client/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+          body: JSON.stringify(payload),
+        })
+
+        if (!res.ok) throw new Error('Error updating client')
+
+        // Refrescar la lista de clientes
+        const { clients } = get()
+        const updatedClients = clients.map((client) =>
+          client.id === id ? { ...client, ...payload } : client
+        )
+        set({ clients: updatedClients })
+
+        return true
+      } catch (error) {
+        console.error('Update client error:', error)
+        return false
+      }
+    },
+
+    deleteClient: async (id: string, teamId: string) => {
+      try {
+        const res = await fetch(`http://localhost:3000/client/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+        })
+
+        if (!res.ok) throw new Error('Error desactivando cliente')
+
+        // Refrescar la lista de clientes
+        await get().fetchClients(teamId)
+        return true
+      } catch (error) {
+        console.error('Delete client error:', error)
+        return false
+      }
+    },
+
+    updateClientStatus: async (
+      id: string,
+      status: 'ACTIVE' | 'CANCELLED' | 'DELETED',
+      teamId: string
+    ) => {
+      try {
+        const res = await fetch(`http://localhost:3000/client/${id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+          body: JSON.stringify({ status }),
+        })
+
+        if (!res.ok) throw new Error('Error updating client status')
+
+        // Refrescar la lista de clientes
+        await get().fetchClients(teamId)
+        return true
+      } catch (error) {
+        console.error('Update client status error:', error)
         return false
       }
     },

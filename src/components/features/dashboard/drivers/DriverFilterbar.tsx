@@ -1,8 +1,15 @@
 import { useDriverStore } from '../../../../core/store/DriverStore'
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { Dropdown } from 'primereact/dropdown'
 
 const DriverFilterBar = () => {
   const { filters, setFilters } = useDriverStore()
+
+  const statusOptions = [
+    { label: 'Todos', value: '' },
+    { label: 'Disponible', value: 'DISPONIBLE' },
+    { label: 'En Viaje', value: 'EN_VIAJE' },
+    { label: 'Desactivado', value: 'DESACTIVADO' },
+  ]
 
   const handleStatusChange = (value: string) => {
     setFilters({ status: value as 'DISPONIBLE' | 'EN_VIAJE' | 'DESACTIVADO' })
@@ -11,20 +18,15 @@ const DriverFilterBar = () => {
   return (
     <div className='flex gap-4'>
       {/* Filtro de Estatus */}
-      <FormControl size='small' className='w-48'>
-        <InputLabel id='status-label'>Estatus</InputLabel>
-        <Select
-          labelId='status-label'
+      <div className='w-48'>
+        <Dropdown
           value={filters.status || ''}
-          label='Estatus'
-          onChange={(e: SelectChangeEvent) => handleStatusChange(e.target.value)}
-        >
-          <MenuItem value=''>Todos</MenuItem>
-          <MenuItem value='DISPONIBLE'>Disponible</MenuItem>
-          <MenuItem value='EN_VIAJE'>En Viaje</MenuItem>
-          <MenuItem value='DESACTIVADO'>Desactivado</MenuItem>
-        </Select>
-      </FormControl>
+          options={statusOptions}
+          onChange={(e) => handleStatusChange(e.value)}
+          placeholder='Filtrar por estatus'
+          className='w-full'
+        />
+      </div>
     </div>
   )
 }

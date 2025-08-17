@@ -1,15 +1,10 @@
 import { useState } from 'react'
 import { Dialog } from 'primereact/dialog'
-import {
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  SelectChangeEvent,
-  FormControl,
-  TextField,
-} from '@mui/material'
-import HandshakeIcon from '@mui/icons-material/Handshake'
+import { Button } from 'primereact/button'
+import { InputText } from 'primereact/inputtext'
+import { InputNumber } from 'primereact/inputnumber'
+import { InputTextarea } from 'primereact/inputtextarea'
+import { Dropdown } from 'primereact/dropdown'
 import { useClientStore } from '../../../../core/store/ClientStore'
 import { useTeamStore } from '../../../../core/store/TeamStore'
 import { useNotification } from '../../../../core/contexts/NotificationContext'
@@ -38,6 +33,20 @@ const DialogCreateClients = () => {
   const [state, setState] = useState('')
   const [country, setCountry] = useState('México')
   const [postalCode, setPostalCode] = useState('')
+
+  // Nuevos campos de logística
+  const [creditLimit, setCreditLimit] = useState<number | null>(null)
+  const [paymentTerms, setPaymentTerms] = useState('')
+  const [preferredPaymentMethod, setPreferredPaymentMethod] = useState('')
+  const [businessType, setBusinessType] = useState('')
+  const [industry, setIndustry] = useState('')
+  const [specialRequirements, setSpecialRequirements] = useState('')
+  const [notes, setNotes] = useState('')
+
+  const clientTypeOptions = [
+    { label: 'Nacional', value: 'nacional' },
+    { label: 'Internacional', value: 'internacional' },
+  ]
 
   const validateClientPayload = (payload: any): string[] => {
     const errors: string[] = []
@@ -98,10 +107,6 @@ const DialogCreateClients = () => {
     return errors
   }
 
-  const handleChangeClientType = (event: SelectChangeEvent) => {
-    setClientType(event.target.value)
-  }
-
   const handleSubmit = async () => {
     console.log('Submitting form...')
     if (!currentTeam) return // Manejar error
@@ -117,6 +122,13 @@ const DialogCreateClients = () => {
       taxRegime: '601',
       zipCode: postalCode,
       teamId: currentTeam.id,
+      creditLimit: creditLimit || undefined,
+      paymentTerms,
+      preferredPaymentMethod,
+      businessType,
+      industry,
+      specialRequirements,
+      notes,
       address: {
         street,
         exterior_number: exteriorNumber,
@@ -139,6 +151,7 @@ const DialogCreateClients = () => {
     if (success) {
       showNotification('Cliente Creado exitosamente', 'success')
       setVisible(false)
+      // Limpiar formulario
       setNombreFiscal('')
       setNombreReferencia('')
       setRfc('')
@@ -153,24 +166,37 @@ const DialogCreateClients = () => {
       setCountry('México')
       setPostalCode('')
       setClientType('')
+      setCreditLimit(null)
+      setPaymentTerms('')
+      setPreferredPaymentMethod('')
+      setBusinessType('')
+      setIndustry('')
+      setSpecialRequirements('')
+      setNotes('')
     }
   }
 
   const footerContent = (
     <div className='flex gap-5 justify-end px-10 pb-4'>
-      <Button variant='outlined' color='primary' onClick={() => setVisible(false)}>
-        Cancelar
-      </Button>
-      <Button variant='contained' color='primary' onClick={handleSubmit}>
-        Guardar
-      </Button>
+      <Button
+        label='Cancelar'
+        icon='pi pi-times'
+        onClick={() => setVisible(false)}
+        className='p-button-secondary'
+      />
+      <Button
+        label='Guardar'
+        icon='pi pi-check'
+        onClick={handleSubmit}
+        className='p-button-success'
+      />
     </div>
   )
 
   const headerContent = (
-    <div className='flex gap-5 p-10'>
-      <span>Crear Cliente Nuevo</span>
-      <HandshakeIcon />
+    <div className='flex gap-5 p-10 items-center'>
+      <span className='text-xl font-semibold'>Crear Cliente Nuevo</span>
+      <i className='pi pi-handshake text-2xl text-primary'></i>
     </div>
   )
 
@@ -187,133 +213,242 @@ const DialogCreateClients = () => {
       <Dialog
         header={headerContent}
         visible={visible}
-        style={{ width: '60vw' }}
+        style={{ width: '70vw' }}
         onHide={() => setVisible(false)}
         footer={footerContent}
+        maximizable
       >
         <div className='p-6'>
           <div className='grid grid-cols-6 gap-5'>
-            <TextField
-              label='Nombre Fiscal'
-              value={nombreFiscal}
-              onChange={(e) => setNombreFiscal(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='Apodo / Nombre Referencia'
-              value={nombreReferencia}
-              onChange={(e) => setNombreReferencia(e.target.value)}
-              className='col-span-3'
-            />
+            {/* Información Básica */}
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='nombreFiscal'>Nombre Fiscal *</label>
+              <InputText
+                id='nombreFiscal'
+                value={nombreFiscal}
+                onChange={(e) => setNombreFiscal(e.target.value)}
+                placeholder='Nombre fiscal de la empresa'
+              />
+            </div>
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='nombreReferencia'>Apodo / Nombre Referencia</label>
+              <InputText
+                id='nombreReferencia'
+                value={nombreReferencia}
+                onChange={(e) => setNombreReferencia(e.target.value)}
+                placeholder='Nombre comercial o de referencia'
+              />
+            </div>
 
-            <FormControl className='col-span-2'>
-              <InputLabel id='select-type-client-label'>Tipo de Cliente</InputLabel>
-              <Select
-                required
-                labelId='select-type-client-label'
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='clientType'>Tipo de Cliente</label>
+              <Dropdown
+                id='clientType'
                 value={clientType}
-                label='Tipo de Cliente'
-                onChange={handleChangeClientType}
-              >
-                <MenuItem value='nacional'>Nacional</MenuItem>
-                <MenuItem value='internacional'>Internacional</MenuItem>
-              </Select>
-            </FormControl>
+                options={clientTypeOptions}
+                onChange={(e) => setClientType(e.value)}
+                placeholder='Seleccionar tipo'
+              />
+            </div>
 
-            <TextField
-              label='RFC'
-              value={rfc}
-              onChange={(e) => setRfc(e.target.value)}
-              required
-              className='col-span-2'
-            />
-            <TextField
-              label='CURP'
-              value={curp}
-              onChange={(e) => setCurp(e.target.value)}
-              className='col-span-2'
-            />
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='rfc'>RFC *</label>
+              <InputText
+                id='rfc'
+                value={rfc}
+                onChange={(e) => setRfc(e.target.value)}
+                placeholder='RFC de la empresa'
+              />
+            </div>
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='curp'>CURP</label>
+              <InputText
+                id='curp'
+                value={curp}
+                onChange={(e) => setCurp(e.target.value)}
+                placeholder='CURP (opcional)'
+              />
+            </div>
 
-            <TextField
-              label='Descripción de la Empresa'
-              multiline
-              rows={3}
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              className='col-span-6'
-            />
-            <TextField
-              label='Correo'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='Telefono'
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className='col-span-3'
-            />
+            <div className='col-span-6 flex flex-col gap-2'>
+              <label htmlFor='descripcion'>Descripción de la Empresa</label>
+              <InputTextarea
+                id='descripcion'
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+                rows={3}
+                placeholder='Descripción de la empresa y sus actividades'
+              />
+            </div>
 
-            <TextField
-              label='Calle'
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='Número Exterior'
-              value={exteriorNumber}
-              onChange={(e) => setExteriorNumber(e.target.value)}
-              required
-              className='col-span-1'
-            />
-            <TextField
-              label='Número Interior'
-              value={interiorNumber}
-              onChange={(e) => setInteriorNumber(e.target.value)}
-              className='col-span-2'
-            />
+            {/* Información de Contacto */}
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='email'>Correo Electrónico *</label>
+              <InputText
+                id='email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='correo@empresa.com'
+              />
+            </div>
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='phone'>Teléfono *</label>
+              <InputText
+                id='phone'
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder='10 dígitos'
+              />
+            </div>
 
-            <TextField
-              label='Colonia'
-              value={neighborhood}
-              onChange={(e) => setNeighborhood(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='Ciudad / Municipio'
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              required
-              className='col-span-3'
-            />
+            {/* Dirección */}
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='street'>Calle *</label>
+              <InputText
+                id='street'
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder='Nombre de la calle'
+              />
+            </div>
+            <div className='col-span-1 flex flex-col gap-2'>
+              <label htmlFor='exteriorNumber'>Número Exterior *</label>
+              <InputText
+                id='exteriorNumber'
+                value={exteriorNumber}
+                onChange={(e) => setExteriorNumber(e.target.value)}
+                placeholder='123'
+              />
+            </div>
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='interiorNumber'>Número Interior</label>
+              <InputText
+                id='interiorNumber'
+                value={interiorNumber}
+                onChange={(e) => setInteriorNumber(e.target.value)}
+                placeholder='Apto 5 (opcional)'
+              />
+            </div>
 
-            <TextField
-              label='Estado'
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='País'
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              required
-              className='col-span-3'
-            />
-            <TextField
-              label='Código Postal'
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              required
-              className='col-span-2'
-            />
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='neighborhood'>Colonia *</label>
+              <InputText
+                id='neighborhood'
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                placeholder='Nombre de la colonia'
+              />
+            </div>
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='city'>Ciudad / Municipio *</label>
+              <InputText
+                id='city'
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder='Nombre de la ciudad'
+              />
+            </div>
+
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='state'>Estado *</label>
+              <InputText
+                id='state'
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                placeholder='Nombre del estado'
+              />
+            </div>
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='country'>País *</label>
+              <InputText
+                id='country'
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder='País'
+              />
+            </div>
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='postalCode'>Código Postal *</label>
+              <InputText
+                id='postalCode'
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                placeholder='12345'
+              />
+            </div>
+
+            {/* Información de Logística */}
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='creditLimit'>Límite de Crédito</label>
+              <InputNumber
+                id='creditLimit'
+                value={creditLimit}
+                onValueChange={(e) => setCreditLimit(e.value || null)}
+                mode='currency'
+                currency='MXN'
+                locale='es-MX'
+                placeholder='$0.00'
+              />
+            </div>
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='paymentTerms'>Condiciones de Pago</label>
+              <InputText
+                id='paymentTerms'
+                value={paymentTerms}
+                onChange={(e) => setPaymentTerms(e.target.value)}
+                placeholder='Ej: 30 días'
+              />
+            </div>
+            <div className='col-span-2 flex flex-col gap-2'>
+              <label htmlFor='preferredPaymentMethod'>Método de Pago Preferido</label>
+              <InputText
+                id='preferredPaymentMethod'
+                value={preferredPaymentMethod}
+                onChange={(e) => setPreferredPaymentMethod(e.target.value)}
+                placeholder='Ej: Transferencia bancaria'
+              />
+            </div>
+
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='businessType'>Tipo de Negocio</label>
+              <InputText
+                id='businessType'
+                value={businessType}
+                onChange={(e) => setBusinessType(e.target.value)}
+                placeholder='Ej: Importador, Distribuidor, Fabricante'
+              />
+            </div>
+            <div className='col-span-3 flex flex-col gap-2'>
+              <label htmlFor='industry'>Industria</label>
+              <InputText
+                id='industry'
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                placeholder='Ej: Automotriz, Alimentaria, Textil'
+              />
+            </div>
+
+            <div className='col-span-6 flex flex-col gap-2'>
+              <label htmlFor='specialRequirements'>Requisitos Especiales de Transporte</label>
+              <InputTextarea
+                id='specialRequirements'
+                value={specialRequirements}
+                onChange={(e) => setSpecialRequirements(e.target.value)}
+                rows={3}
+                placeholder='Requisitos especiales para el transporte de mercancías'
+              />
+            </div>
+
+            <div className='col-span-6 flex flex-col gap-2'>
+              <label htmlFor='notes'>Notas Adicionales</label>
+              <InputTextarea
+                id='notes'
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                placeholder='Notas adicionales sobre el cliente'
+              />
+            </div>
           </div>
         </div>
       </Dialog>

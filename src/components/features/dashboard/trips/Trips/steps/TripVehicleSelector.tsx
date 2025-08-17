@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import VehicleFilterBar from '../../../units/VehicleFilterBar'
 import VehicleStatusTag from '../../../../../ui/Tag/VehicleStatusTag'
+import { InputText } from 'primereact/inputtext'
+import { Dropdown } from 'primereact/dropdown'
 
 import TruckImage from '../../../../../../assets/images/truck.jpg'
 import { useTeamStore } from '../../../../../../core/store/TeamStore'
@@ -13,8 +14,17 @@ interface TripVehicleSelectorProps {
 
 const TripVehicleSelector = ({ selectedVehicleId, onSelect }: TripVehicleSelectorProps) => {
   const { currentTeam } = useTeamStore()
-  const { vehicles, fetchVehicles, filters, first, rows, hasMore, loading, setPagination } =
-    useVehicleStore()
+  const {
+    vehicles,
+    fetchVehicles,
+    filters,
+    first,
+    rows,
+    hasMore,
+    loading,
+    setPagination,
+    setFilters,
+  } = useVehicleStore()
 
   useEffect(() => {
     if (currentTeam?.id) fetchVehicles(currentTeam.id)
@@ -31,30 +41,96 @@ const TripVehicleSelector = ({ selectedVehicleId, onSelect }: TripVehicleSelecto
   return (
     <div className='h-[60vh] overflow-y-auto flex flex-col' onScroll={onScroll}>
       <div className='mb-4'>
-        <VehicleFilterBar />
+        <h3 className='text-lg font-semibold mb-2'>Selecciona un vehículo</h3>
+        <p className='text-sm text-gray-600'>Elige el vehículo para el viaje</p>
       </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6'>
+      {/* Filtros */}
+      <div className='flex flex-wrap gap-6 items-end mb-4'>
+        <div className='w-80'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>Buscar</label>
+          <InputText
+            value={filters.search || ''}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            placeholder='Buscar por placa, marca o modelo'
+            className='w-full'
+          />
+        </div>
+
+        <div className='w-60'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>Estatus</label>
+          <Dropdown
+            value={filters.status || ''}
+            options={[
+              { label: 'Todos', value: '' },
+              { label: 'Disponible', value: 'DISPONIBLE' },
+              { label: 'En Uso', value: 'EN_USO' },
+              { label: 'Mantenimiento', value: 'MANTENIMIENTO' },
+              { label: 'Cancelado', value: 'CANCELADO' },
+              { label: 'Desuso', value: 'DESUSO' },
+            ]}
+            onChange={(e) => setFilters({ ...filters, status: e.value })}
+            placeholder='Seleccionar estatus'
+            className='w-full'
+          />
+        </div>
+
+        <div className='w-60'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>Tipo</label>
+          <Dropdown
+            value={filters.type || ''}
+            options={[
+              { label: 'Todos', value: '' },
+              { label: 'Trailer', value: 'TRAILER' },
+              { label: 'Camioneta', value: 'CAMIONETA' },
+              { label: 'Tractocamión', value: 'TRACTOCAMIÓN' },
+              { label: 'Remolque', value: 'REMOLQUE' },
+            ]}
+            onChange={(e) => setFilters({ ...filters, type: e.value })}
+            placeholder='Seleccionar tipo'
+            className='w-full'
+          />
+        </div>
+      </div>
+
+      <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4'>
         {vehicles.map((v) => (
           <div
             key={v.id}
             onClick={() => onSelect(v.id!)}
-            className={`cursor-pointer border rounded-lg shadow-sm transition bg-white flex flex-col items-center overflow-hidden ${
-              v.id === selectedVehicleId ? 'border-primary ring-2 ring-primary' : 'border-gray-200'
+            className={`cursor-pointer border rounded-lg shadow-sm transition hover:shadow-md ${
+              v.id === selectedVehicleId
+                ? 'border-primary ring-2 ring-primary bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
           >
-            <img src={TruckImage} alt={v.plate} className='w-full h-40 object-cover' />
-            <div className='p-4 text-center space-y-2 w-full'>
-              <h2 className='text-lg font-bold text-gray-800'>{v.plate}</h2>
-              <p className='text-sm text-gray-500'>
+            <img
+              src={v.imageUrl || TruckImage}
+              alt={v.plate}
+              className='w-full h-40 object-cover rounded-t-lg'
+              onError={(e) => {
+                e.currentTarget.src = TruckImage
+              }}
+            />
+            <div className='p-4'>
+              <div className='flex items-start justify-between mb-2'>
+                <h4 className='font-semibold text-sm'>{v.plate}</h4>
+                <VehicleStatusTag status={v.status} />
+              </div>
+              <p className='text-xs text-gray-600 mb-1'>
                 {v.brand} · {v.model}
               </p>
-              <p className='text-xs text-gray-400'>{v.type}</p>
-              <VehicleStatusTag status={v.status} />
+              <p className='text-xs text-gray-500'>{v.type}</p>
             </div>
           </div>
         ))}
       </div>
+
+      {loading && (
+        <div className='flex justify-center py-4'>
+          <i className='pi pi-spin pi-spinner text-2xl'></i>
+        </div>
+      )}
 
       {hasMore && !loading && (
         <div className='flex justify-center py-4'>
@@ -62,8 +138,15 @@ const TripVehicleSelector = ({ selectedVehicleId, onSelect }: TripVehicleSelecto
             onClick={() => setPagination(first + rows, rows)}
             className='px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover'
           >
-            Cargar más
+            Cargar más vehículos
           </button>
+        </div>
+      )}
+
+      {vehicles.length === 0 && !loading && (
+        <div className='text-center py-8 text-gray-500'>
+          <i className='pi pi-truck text-3xl mb-2'></i>
+          <p>No hay vehículos disponibles</p>
         </div>
       )}
     </div>

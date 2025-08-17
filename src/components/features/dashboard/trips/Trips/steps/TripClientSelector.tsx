@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useClientStore } from '../../../../../../core/store/ClientStore'
 import { useTeamStore } from '../../../../../../core/store/TeamStore'
-import { TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { InputText } from 'primereact/inputtext'
+import { Dropdown } from 'primereact/dropdown'
 import ClientStatusTag from '../../../../../ui/Tag/StatusTag'
 
 interface TripClientSelectorProps {
@@ -31,65 +32,86 @@ const TripClientSelector = ({ selectedClientId, onSelect }: TripClientSelectorPr
 
   return (
     <div className='flex flex-col gap-6 h-[60vh] overflow-y-auto'>
-      {/* Filtros */}
-      <div className='flex flex-wrap gap-6 items-end'>
-        <TextField
-          label='Buscar por nombre, email o RFC'
-          variant='outlined'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          size='small'
-          className='w-80'
-        />
-
-        <FormControl size='small' className='w-60'>
-          <InputLabel id='status-filter-label'>Estatus</InputLabel>
-          <Select
-            labelId='status-filter-label'
-            value={statusFilter}
-            label='Estatus'
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <MenuItem value=''>Todos</MenuItem>
-            <MenuItem value='ACTIVE'>Activo</MenuItem>
-            <MenuItem value='CANCELLED'>Desactivado</MenuItem>
-            <MenuItem value='DELETED'>Eliminado</MenuItem>
-          </Select>
-        </FormControl>
+      <div className='mb-4'>
+        <h3 className='text-lg font-semibold mb-2'>Selecciona un cliente</h3>
+        <p className='text-sm text-gray-600'>Elige el cliente para el viaje</p>
       </div>
 
-      {/* Tabla simple de selección */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5  gap-2'>
+      {/* Filtros */}
+      <div className='flex flex-wrap gap-6 items-end'>
+        <div className='w-80'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>Buscar</label>
+          <InputText
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder='Buscar por nombre, email o RFC'
+            className='w-full'
+          />
+        </div>
+
+        <div className='w-60'>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>Estatus</label>
+          <Dropdown
+            value={statusFilter}
+            options={[
+              { label: 'Todos', value: '' },
+              { label: 'Activo', value: 'ACTIVE' },
+              { label: 'Desactivado', value: 'CANCELLED' },
+              { label: 'Eliminado', value: 'DELETED' },
+            ]}
+            onChange={(e) => setStatusFilter(e.value)}
+            placeholder='Seleccionar estatus'
+            className='w-full'
+          />
+        </div>
+      </div>
+
+      {/* Cartas de clientes */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4'>
         {clients.map((client) => (
           <div
             key={client.id}
             onClick={() => onSelect(client.id!)}
-            className={`rounded-md shadow-sm transition  flex gap-4 p-4 cursor-pointer hover:bg-gray-50 ${
+            className={`border rounded-lg shadow-sm transition cursor-pointer hover:shadow-md ${
               client.id === selectedClientId
-                ? 'bg-blue-50 border-l-4 border-y-2 border-r-2 border-primary'
-                : 'border-gray-100 border-2'
+                ? 'border-primary ring-2 ring-primary bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
           >
-            <div className='flex flex-col flex-1 gap-2'>
-              <h2 className='text-md font-bold'>{client.name}</h2>
-              <p className='text-sm text-gray-600'>
-                {client.email} · {client.rfc}
-              </p>
-              <ClientStatusTag status={client.status!} />
+            <div className='p-4'>
+              <div className='flex items-start justify-between mb-2'>
+                <h4 className='font-semibold text-sm'>{client.name}</h4>
+                <ClientStatusTag status={client.status!} />
+              </div>
+
+              {client.name_related && (
+                <p className='text-xs text-gray-500 mb-1'>{client.name_related}</p>
+              )}
+
+              <p className='text-xs text-gray-600 mb-1'>RFC: {client.rfc}</p>
+              <p className='text-xs text-gray-600 mb-2'>{client.email}</p>
+              <p className='text-xs text-gray-600'>{client.phone}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Paginación simple */}
+      {/* Paginación */}
       {totalRecords > rows && (
-        <div className='flex justify-center py-2'>
+        <div className='flex justify-center py-4'>
           <button
             onClick={() => setPagination(first + rows, rows)}
-            className='bg-primary text-white px-4 py-2 rounded hover:bg-primary-hover'
+            className='px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover'
           >
-            Cargar más
+            Cargar más clientes
           </button>
+        </div>
+      )}
+
+      {clients.length === 0 && (
+        <div className='text-center py-8 text-gray-500'>
+          <i className='pi pi-users text-3xl mb-2'></i>
+          <p>No hay clientes disponibles</p>
         </div>
       )}
     </div>

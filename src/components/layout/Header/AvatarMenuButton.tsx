@@ -1,15 +1,16 @@
 import { useState, MouseEvent } from 'react'
 import { Avatar, IconButton, Menu, MenuItem } from '@mui/material'
-import SettingsIcon from '@mui/icons-material/Settings'
 import PersonIcon from '@mui/icons-material/Person'
 import GroupsIcon from '@mui/icons-material/Groups'
 
 import { useNavigate } from 'react-router'
 import { ROUTES } from '../../../constants/routes'
-import DummyAvatar from '../../../assets/images/Madara.jpg'
+import { useAuth } from '../../../core/contexts/AuthContext'
+import placeholderImage from '../../../assets/images/placeholder.jpg'
 
 const AvatarMenuButton = () => {
   const navigate = useNavigate()
+  const { currentUser } = useAuth()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -36,7 +37,14 @@ const AvatarMenuButton = () => {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        <Avatar alt='Usuario' src={DummyAvatar} />
+        <Avatar
+          src={currentUser?.photoUrl}
+          sx={{
+            width: 40,
+            height: 40,
+            bgcolor: currentUser?.photoUrl ? 'transparent' : 'primary.main',
+          }}
+        ></Avatar>
       </IconButton>
       <Menu
         id='avatar-menu'
@@ -53,10 +61,6 @@ const AvatarMenuButton = () => {
         <MenuItem onClick={() => handlePath('/equipos')}>
           <GroupsIcon style={{ marginRight: 8 }} className='text-primary' />
           <span className='text-primary'>Cambiar de Equipo</span>
-        </MenuItem>
-        <MenuItem onClick={() => handlePath(ROUTES.CONFIGURACION)}>
-          <SettingsIcon style={{ marginRight: 8 }} className='text-primary' />
-          <span className='text-primary'>Configuracion</span>
         </MenuItem>
       </Menu>
     </div>

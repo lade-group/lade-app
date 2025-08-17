@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Dialog } from 'primereact/dialog'
 import { Steps } from 'primereact/steps'
 import { Dropdown } from 'primereact/dropdown'
+import { Button } from 'primereact/button'
 import { Close } from '@mui/icons-material'
 
 import { useTeamStore } from '../../../../../core/store/TeamStore'
@@ -9,17 +10,18 @@ import { useTripsStore } from '../../../../../core/store/TripsStore'
 import { useClientStore } from '../../../../../core/store/ClientStore'
 import { useDriverStore } from '../../../../../core/store/DriverStore'
 import { useVehicleStore } from '../../../../../core/store/VehicleStore'
+import { useRouteStore } from '../../../../../core/store/RouteStore'
 
 import TripDetailsForm from './steps/TripDetailsForm'
 import TripClientSelector from './steps/TripClientSelector'
 import TripVehicleSelector from './steps/TripVehicleSelector'
 import TripDriverSelector from './steps/TripDriverSelector'
+import TripRouteSelector from './steps/TripRouteSelector'
 
 const DialogCreateTrip = () => {
   const [visible, setVisible] = useState(false)
-  const [form, setForm] = useState<any>({ status: 'PREINICIALIZADO' })
+  const [form, setForm] = useState<any>({})
   const [activeIndex, setActiveIndex] = useState(0)
-  const [routes, setRoutes] = useState<any[]>([])
   const [cargos, setCargos] = useState<any[]>([])
 
   const { currentTeam } = useTeamStore()
@@ -27,13 +29,10 @@ const DialogCreateTrip = () => {
   const { clients } = useClientStore()
   const { drivers } = useDriverStore()
   const { vehicles } = useVehicleStore()
+  const { routes } = useRouteStore()
 
   useEffect(() => {
     if (!currentTeam) return
-    setRoutes([
-      { id: '1', originCity: 'Monterrey', destinationCity: 'Saltillo' },
-      { id: '2', originCity: 'Guadalajara', destinationCity: 'CDMX' },
-    ])
   }, [currentTeam])
 
   const handleChange = (name: string, value: any) => {
@@ -42,12 +41,36 @@ const DialogCreateTrip = () => {
 
   const handleSubmit = async () => {
     if (!currentTeam) return
-    const payload = { ...form, teamId: currentTeam.id }
+
+    // Validar que todos los campos requeridos estén completos
+    const requiredFields = [
+      'clientId',
+      'driverId',
+      'vehicleId',
+      'routeId',
+      'startDate',
+      'endDate',
+      'price',
+    ]
+    const missingFields = requiredFields.filter((field) => !form[field])
+
+    if (missingFields.length > 0) {
+      console.error('Campos faltantes:', missingFields)
+      return
+    }
+
+    const payload = {
+      ...form,
+      teamId: currentTeam.id,
+      cargos: cargos.length > 0 ? cargos : undefined,
+    }
+
     const success = await createTrip(payload)
     if (success) {
       setVisible(false)
       setForm({})
       setActiveIndex(0)
+      setCargos([])
     }
   }
 
@@ -60,8 +83,32 @@ const DialogCreateTrip = () => {
     { label: 'Resumen' },
   ]
 
-  const next = () => setActiveIndex((prev) => Math.min(prev + 1, 5))
+  const next = () => {
+    // Validar que el step actual tenga la información necesaria
+    const canProceed = validateCurrentStep()
+    if (canProceed) {
+      setActiveIndex((prev) => Math.min(prev + 1, 5))
+    }
+  }
+
   const back = () => setActiveIndex((prev) => Math.max(prev - 1, 0))
+
+  const validateCurrentStep = () => {
+    switch (activeIndex) {
+      case 0: // Cliente
+        return !!form.clientId
+      case 1: // Conductor
+        return !!form.driverId
+      case 2: // Vehículo
+        return !!form.vehicleId
+      case 3: // Ruta
+        return !!form.routeId
+      case 4: // Detalles
+        return !!form.startDate && !!form.endDate && !!form.price
+      default:
+        return true
+    }
+  }
 
   const renderStepContent = () => {
     switch (activeIndex) {
@@ -89,15 +136,9 @@ const DialogCreateTrip = () => {
         )
       case 3:
         return (
-          <Dropdown
-            value={form.routeId}
-            options={routes.map((r) => ({
-              label: `${r.originCity} → ${r.destinationCity}`,
-              value: r.id,
-            }))}
-            onChange={(e) => handleChange('routeId', e.value)}
-            placeholder='Selecciona una ruta'
-            className='w-full'
+          <TripRouteSelector
+            selectedRouteId={form.routeId}
+            onSelect={(id) => handleChange('routeId', id)}
           />
         )
       case 4:
@@ -122,17 +163,14 @@ const DialogCreateTrip = () => {
               <b>Vehículo:</b> {vehicles.find((v) => v.id === form.vehicleId)?.plate}
             </p>
             <p>
-              <b>Ruta:</b> {routes.find((r) => r.id === form.routeId)?.originCity} →{' '}
-              {routes.find((r) => r.id === form.routeId)?.destinationCity}
-            </p>
-            <p>
-              <b>Producto:</b> {form.product}
-            </p>
-            <p>
-              <b>Peso:</b> {form.weightKg} kg
+              <b>Ruta:</b> {routes.find((r) => r.id === form.routeId)?.name} (
+              {routes.find((r) => r.id === form.routeId)?.code})
             </p>
             <p>
               <b>Precio:</b> ${form.price}
+            </p>
+            <p>
+              <b>Cargos:</b> {cargos.length} item(s)
             </p>
             <p>
               <b>Inicio:</b>{' '}
@@ -190,27 +228,30 @@ const DialogCreateTrip = () => {
 
             <div className='flex justify-end gap-4 px-6 pb-6'>
               {activeIndex > 0 && (
-                <button
-                  className='bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md'
+                <Button
+                  label='Anterior'
+                  icon='pi pi-chevron-left'
                   onClick={back}
-                >
-                  Anterior
-                </button>
+                  className='p-button-outlined'
+                />
               )}
               {activeIndex < steps.length - 1 ? (
-                <button
-                  className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover'
+                <Button
+                  label='Siguiente'
+                  icon='pi pi-chevron-right'
+                  iconPos='right'
                   onClick={next}
-                >
-                  Siguiente
-                </button>
+                  disabled={!validateCurrentStep()}
+                  className='p-button-primary'
+                />
               ) : (
-                <button
-                  className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover'
+                <Button
+                  label='Crear Viaje'
+                  icon='pi pi-check'
                   onClick={handleSubmit}
-                >
-                  Guardar
-                </button>
+                  disabled={!validateCurrentStep()}
+                  className='p-button-success'
+                />
               )}
             </div>
           </div>

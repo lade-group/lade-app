@@ -1,8 +1,10 @@
 // src/components/Trips/steps/TripDetailsForm.tsx
 import { useState } from 'react'
-import { TextField, IconButton } from '@mui/material'
+import { InputText } from 'primereact/inputtext'
+import { InputNumber } from 'primereact/inputnumber'
 import { Calendar } from 'primereact/calendar'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { Button } from 'primereact/button'
+import { Card } from 'primereact/card'
 
 interface Props {
   form: any
@@ -16,7 +18,7 @@ const TripDetailsForm = ({ form, onChange, cargos, setCargos }: Props) => {
 
   const handleAddCargo = () => {
     if (!cargoInput.name || !cargoInput.weightKg) return
-    setCargos([...cargos, { ...cargoInput }])
+    setCargos([...cargos, { ...cargoInput, weightKg: Number(cargoInput.weightKg) }])
     setCargoInput({ name: '', weightKg: '', imageUrl: '' })
   }
 
@@ -33,73 +35,117 @@ const TripDetailsForm = ({ form, onChange, cargos, setCargos }: Props) => {
     <div className='flex flex-col gap-6'>
       {/* Información del viaje */}
       <div>
-        <h4 className='text-base font-medium mb-2'>Información del viaje</h4>
-        <div className='grid grid-cols-3 gap-4'>
-          <Calendar
-            showTime
-            hourFormat='24'
-            minDate={minDate}
-            value={startDate}
-            onChange={(e) => onChange('startDate', e.value?.toISOString())}
-            placeholder='Fecha de inicio'
-            className='w-full'
-          />
-          <Calendar
-            showTime
-            hourFormat='24'
-            minDate={endMinDate}
-            value={form.endDate ? new Date(form.endDate) : null}
-            onChange={(e) => onChange('endDate', e.value?.toISOString())}
-            placeholder='Fecha de fin'
-            className='w-full'
-          />
+        <h4 className='text-base font-medium mb-4'>Información del viaje</h4>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Fecha de inicio</label>
+            <Calendar
+              showTime
+              hourFormat='24'
+              minDate={minDate}
+              value={startDate}
+              onChange={(e) => onChange('startDate', e.value?.toISOString())}
+              placeholder='Seleccionar fecha y hora'
+              className='w-full'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Fecha de fin</label>
+            <Calendar
+              showTime
+              hourFormat='24'
+              minDate={endMinDate}
+              value={form.endDate ? new Date(form.endDate) : null}
+              onChange={(e) => onChange('endDate', e.value?.toISOString())}
+              placeholder='Seleccionar fecha y hora'
+              className='w-full'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Precio ($)</label>
+            <InputNumber
+              value={form.price}
+              onValueChange={(e) => onChange('price', e.value)}
+              mode='currency'
+              currency='USD'
+              locale='en-US'
+              placeholder='0.00'
+              className='w-full'
+            />
+          </div>
         </div>
       </div>
 
       {/* Información de la carga */}
       <div className='pt-4'>
-        <h4 className='text-base font-medium mb-2'>Agregar carga</h4>
-        <div className='grid grid-cols-7 gap-4'>
-          <TextField
-            label='Descripción'
-            className='col-span-2'
-            value={cargoInput.name}
-            onChange={(e) => setCargoInput({ ...cargoInput, name: e.target.value })}
-          />
-          <TextField
-            label='Peso (kg)'
-            type='number'
-            className='col-span-2'
-            value={cargoInput.weightKg}
-            onChange={(e) => setCargoInput({ ...cargoInput, weightKg: e.target.value })}
-          />
-          <TextField
-            label='URL Imagen (opcional)'
-            className='col-span-2'
-            value={cargoInput.imageUrl}
-            onChange={(e) => setCargoInput({ ...cargoInput, imageUrl: e.target.value })}
-          />{' '}
-          <button
-            className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover'
-            onClick={handleAddCargo}
-          >
-            Agregar
-          </button>
+        <h4 className='text-base font-medium mb-4'>Agregar carga</h4>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Descripción</label>
+            <InputText
+              value={cargoInput.name}
+              onChange={(e) => setCargoInput({ ...cargoInput, name: e.target.value })}
+              placeholder='Descripción del cargo'
+              className='w-full'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Peso (kg)</label>
+            <InputNumber
+              value={cargoInput.weightKg ? Number(cargoInput.weightKg) : null}
+              onValueChange={(e) =>
+                setCargoInput({ ...cargoInput, weightKg: e.value?.toString() || '' })
+              }
+              placeholder='0'
+              className='w-full'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              URL Imagen (opcional)
+            </label>
+            <InputText
+              value={cargoInput.imageUrl}
+              onChange={(e) => setCargoInput({ ...cargoInput, imageUrl: e.target.value })}
+              placeholder='https://...'
+              className='w-full'
+            />
+          </div>
+          <div className='flex items-end'>
+            <Button
+              label='Agregar'
+              icon='pi pi-plus'
+              onClick={handleAddCargo}
+              disabled={!cargoInput.name || !cargoInput.weightKg}
+              className='w-full'
+            />
+          </div>
         </div>
 
-        <ul className='mt-4 space-y-2'>
-          {cargos.map((cargo, idx) => (
-            <li key={idx} className='text-sm border p-2 rounded flex justify-between items-center'>
-              <span>
-                <strong>{cargo.name}</strong> · {cargo.weightKg} kg{' '}
-                {cargo.imageUrl && <span className='text-blue-500'>(imagen)</span>}
-              </span>
-              <IconButton onClick={() => handleDeleteCargo(idx)} aria-label='delete'>
-                <DeleteIcon fontSize='small' />
-              </IconButton>
-            </li>
-          ))}
-        </ul>
+        {/* Lista de cargos */}
+        {cargos.length > 0 && (
+          <div className='space-y-2'>
+            <h5 className='text-sm font-medium text-gray-700'>Cargos agregados:</h5>
+            {cargos.map((cargo, idx) => (
+              <Card key={idx} className='p-3'>
+                <div className='flex justify-between items-center'>
+                  <div>
+                    <span className='font-medium'>{cargo.name}</span>
+                    <span className='text-gray-500 ml-2'>· {cargo.weightKg} kg</span>
+                    {cargo.imageUrl && <span className='text-blue-500 ml-2'>(imagen)</span>}
+                  </div>
+                  <Button
+                    icon='pi pi-trash'
+                    severity='danger'
+                    text
+                    size='small'
+                    onClick={() => handleDeleteCargo(idx)}
+                  />
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

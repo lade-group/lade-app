@@ -9,7 +9,7 @@ const TripsPage = () => {
         <DialogCreateTrip />
       </div>
       <div>
-        <span className='text-lg'>Maneja a los pilotos de tus unidades</span>
+        <span className='text-lg'>Gestiona y monitorea todos los viajes de tu flota</span>
       </div>
       <div className='pt-10'>
         <TripList />

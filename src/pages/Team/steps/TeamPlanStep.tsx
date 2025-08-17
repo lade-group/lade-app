@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button } from '@mui/material'
 import clsx from 'clsx'
 import { TeamFormData } from '../../../types/teams'
 import { useNotification } from '../../../core/contexts/NotificationContext'
 import { useAuth } from '../../../core/contexts/AuthContext'
+import { useTeamStore } from '../../../core/store/TeamStore'
 
 interface Props {
   data: TeamFormData
@@ -47,6 +47,7 @@ const TeamPlanStep: React.FC<Props> = ({ data, setData, back }) => {
   const { showNotification } = useNotification()
 
   const { setCurrentTeam } = useAuth()
+  const { createTeam } = useTeamStore()
 
   const handlePlanSelect = (planId: string) => {
     setSelected(planId)
@@ -54,7 +55,7 @@ const TeamPlanStep: React.FC<Props> = ({ data, setData, back }) => {
   }
 
   const handleFinish = async () => {
-    const teamData = { ...data, logo: 'imagen guardada' }
+    const teamData = { ...data, logo: '' }
 
     const missingFields = []
     if (!teamData.name) missingFields.push('nombre')
@@ -76,24 +77,18 @@ const TeamPlanStep: React.FC<Props> = ({ data, setData, back }) => {
     }
 
     try {
-      const res = await fetch(`${API_URL}/teams`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(teamData),
-      })
+      // Extraer el archivo de logo del data
+      const logoFile = data.logoFile || undefined
+      console.log('TeamPlanStep - logoFile:', logoFile)
+      const success = await createTeam(teamData, logoFile)
 
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || 'Error al crear el equipo')
+      if (success) {
+        setCurrentTeam({ logo: teamData.logo || '', name: teamData.name, id: '' })
+        showNotification('¡Equipo creado exitosamente!', 'success')
+        navigate('/dashboard')
+      } else {
+        throw new Error('Error al crear el equipo')
       }
-
-      setCurrentTeam({ logo: teamData.logo, name: teamData.name, id: '' })
-
-      showNotification('¡Equipo creado exitosamente!', 'success')
-      navigate('/dashboard')
     } catch (err) {
       if (err instanceof Error) {
         showNotification(err.message, 'error')
@@ -136,12 +131,19 @@ const TeamPlanStep: React.FC<Props> = ({ data, setData, back }) => {
       </div>
 
       <div className='flex justify-between mt-10'>
-        <Button variant='outlined' onClick={back}>
+        <button
+          className='bg-secondary hover:bg-gray-300 hover:cursor-pointer text-priamry font-medium px-6 py-3 rounded-md transition mt-5'
+          onClick={back}
+        >
           Atrás
-        </Button>
-        <Button variant='contained' color='primary' disabled={!selected} onClick={handleFinish}>
+        </button>
+        <button
+          className='bg-primary hover:bg-primary-hover hover:cursor-pointer text-white font-medium px-6 py-3 rounded-md transition mt-5'
+          disabled={!selected}
+          onClick={handleFinish}
+        >
           Finalizar y crear equipo
-        </Button>
+        </button>
       </div>
     </div>
   )

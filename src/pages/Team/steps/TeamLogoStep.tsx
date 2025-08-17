@@ -1,5 +1,4 @@
-import { useRef, useState } from 'react'
-
+import { useState } from 'react'
 import { TeamFormData } from '../../../types/teams'
 
 interface Props {
@@ -10,36 +9,15 @@ interface Props {
 }
 
 const TeamLogoStep: React.FC<Props> = ({ data, setData, next, back }) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(data.logo || null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [logoFile, setLogoFile] = useState<File | null>(null)
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
-        setData({ ...data, logo: reader.result as string }) // puede ser base64 o usar file.name si prefieres backend
-      }
-      reader.readAsDataURL(file)
+      console.log('Logo file selected:', file.name, file.size, file.type)
+      setLogoFile(file)
+      setData({ ...data, logoFile: file })
     }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
-        setData({ ...data, logo: reader.result as string })
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
   }
 
   return (
@@ -47,36 +25,16 @@ const TeamLogoStep: React.FC<Props> = ({ data, setData, next, back }) => {
       <h2 className='text-4xl font-bold'>¿Quieres añadir un logo para tu equipo?</h2>
       <p className='text-sm text-gray-500'>Este paso es opcional.</p>
 
-      <div
-        className='w-full border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-primary transition'
-        onClick={() => fileInputRef.current?.click()}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-      >
-        {previewUrl ? (
-          <div className='flex flex-col items-center gap-4'>
-            <img
-              src={previewUrl}
-              alt='Logo preview'
-              className='w-32 h-32 object-cover rounded shadow'
-            />
-            <button
-              className='text-primary text-sm underline'
-              onClick={(e) => {
-                e.stopPropagation()
-                setPreviewUrl(null)
-                setData({ ...data, logo: '' })
-              }}
-            >
-              Cambiar imagen
-            </button>
-          </div>
-        ) : (
-          <p className='text-gray-500'>
-            Haz clic o arrastra una imagen aquí para subir el logo del equipo
-          </p>
+      <div className='max-w-md mx-auto'>
+        <input
+          type='file'
+          accept='image/*'
+          onChange={handleLogoChange}
+          className='w-full p-2 border border-gray-300 rounded-md'
+        />
+        {logoFile && (
+          <p className='text-sm text-gray-600 mt-1'>Archivo seleccionado: {logoFile.name}</p>
         )}
-        <input type='file' accept='image/*' ref={fileInputRef} onChange={handleFileSelect} hidden />
       </div>
 
       <div className='flex justify-between mt-6'>
